@@ -1,0 +1,283 @@
+/**
+Theme Name: YM Scientific
+Author: June Zhu
+Author URI: http://wpastra.com/about/
+Description: A child theme for YM Scientific corporate website
+Version: 1.0.0
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: ym-scientific
+Template: astra
+*/
+
+/* 全局字体 - 排除SVG元素和i标签 */
+*:not(svg):not(svg *):not(i):not(i *) {
+  font-family: Montserrat !important;
+}
+
+.ast-above-header-wrap {
+	height: 50px;
+}
+.ast-above-header-bar {
+	box-shadow: 0 2px 10px 0 rgba(17, 100, 168, 0.2);
+}
+
+.hp-main-banner {
+  height: 800px;
+}
+
+.type-page .entry-header .entry-title {
+  display: none !important;
+}
+
+
+/* ====== Contact US page form ====== */
+.wpforms-container input.wpforms-field-medium {
+  max-width: 100%;
+}
+
+.contact-us-one-third-field {
+  width: calc(100% / 3);
+  float: left;
+}
+
+.one-third-middle {
+  padding: 10px !important;
+}
+
+/* ====== footer message form ====== */
+
+/***WP Show Posts News***/
+/* ====== WP Show Posts (ID: 963) - Two-column Responsive Layout ====== */
+/* 针对 News 列表 #wpsp-963 的整体布局 */
+.wp-show-posts-columns#wpsp-963{
+  margin-left: 0 !important;
+}
+
+#wpsp-963 .wp-show-posts-single {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-start !important;
+  gap: 20px !important;
+  position: relative !important;
+  padding-bottom: 30px;
+}
+
+#wpsp-963 .wp-show-posts-single .wp-show-posts-image::after {
+  content: "";
+  position: absolute;
+  top: 0; 
+  left: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  z-index: 5;
+}
+
+/* 左边图片 */
+#wpsp-963 .wp-show-posts-image {
+  width: 230px !important;
+  height: 190px !important;
+  grid-row: 1 / 3 !important;
+  margin: 0 !important;
+  position: relative !important;
+}
+
+#wpsp-963 .wp-show-posts-image img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+/* 右边内容区域 */
+#wpsp-963 .wp-show-posts-inner {
+  display: grid !important;
+  grid-template-columns: 40% 1fr !important;
+  grid-template-rows: auto auto !important;
+  gap: 0 20px !important;
+  margin: 5px !important;
+}
+
+/* 标题在第一行第二列 */
+#wpsp-963 .wp-show-posts-entry-header {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+}
+
+/* 摘要在第二行第二列 */
+#wpsp-963 .wp-show-posts-entry-summary {
+  grid-column: 2 !important;
+  grid-row: 2 !important;
+}
+
+/* 标题部分 */
+#wpsp-963 .wp-show-posts-entry-header {
+  margin-bottom: 10px !important;
+}
+
+#wpsp-963 .wp-show-posts-entry-title a {
+  font-family: Montserrat !important;
+  font-weight: 400 !important;
+  font-size: 16px !important;
+  color: #000000 !important;
+  line-height: 25px !important;
+  text-decoration: none !important;
+}
+
+#wpsp-963 .wp-show-posts-entry-title a:hover {
+  color: #0087D1 !important;
+}
+
+/* 当悬停在整个条目上时，标题也变色 */
+#wpsp-963 .wp-show-posts-single:hover .wp-show-posts-entry-title a {
+  color: #0087D1 !important;
+}
+
+/* 摘要部分 */
+#wpsp-963 .wp-show-posts-entry-summary {
+  font-family: Montserrat !important;
+  font-weight: 400 !important;
+  font-size: 14px !important;
+  color: #666666 !important;
+  line-height: 25px !important;
+}
+
+/* 加载更多按钮居中 */
+.wpsp-load-more {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+  padding: 20px 0 !important;
+  gap: 10px !important;
+}
+
+/* 分页器数字链接样式 */
+.wpsp-load-more .page-numbers {
+  font-family: Montserrat !important;
+  font-weight: 400 !important;
+  font-size: 16px !important;
+  color: #000000 !important;
+  line-height: 24px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 40px !important;
+  height: 40px !important;
+  text-decoration: none !important;
+  border-radius: 4px !important;
+}
+
+/* 每个page number之间距离60px */
+.wpsp-load-more .page-numbers:not(.next):not(:last-child) {
+  margin-right: 60px !important;
+}
+
+/* Next按钮与数字之间距离 */
+.wpsp-load-more .next.page-numbers {
+  margin-left: 60px !important;
+  margin-right: 0 !important;
+}
+
+/* 当前页（active）背景色 */
+.wpsp-load-more .page-numbers.current {
+  background: #3083D6 !important;
+  color: #ffffff !important;
+}
+
+/* Hover效果 - 有透明度的相同颜色 */
+.wpsp-load-more .page-numbers:hover:not(.current) {
+  background: rgba(48, 131, 214, 0.2) !important;
+  color: #000000 !important;
+  transition: background 0.3s ease !important;
+}
+
+/* 响应式：手机端上下排列 */
+@media (max-width: 768px) {
+  #wpsp-963 .wp-show-posts-single {
+    flex-direction: column !important;
+  }
+
+  #wpsp-963 .wp-show-posts-inner {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto auto auto !important;
+    gap: 15px 0 !important;
+  }
+
+  /* 图片在第一行 */
+  #wpsp-963 .wp-show-posts-image {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    width: 100% !important;
+    height: 200px !important;
+    margin: 0 !important;
+  }
+
+  /* 标题在第二行 */
+  #wpsp-963 .wp-show-posts-entry-header {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+    margin-bottom: 10px !important;
+  }
+
+  /* 摘要在第三行 */
+  #wpsp-963 .wp-show-posts-entry-summary {
+    grid-column: 1 !important;
+    grid-row: 3 !important;
+  }
+}
+
+/* ====== Single News Banner - 突破容器限制 ====== */
+body {
+  overflow-x: hidden !important;
+}
+
+.news-single-hero-wrapper {
+  position: relative;
+  width: 100vw !important;
+  left: 50% !important;
+  margin-left: -50vw !important;
+  overflow: hidden !important;
+}
+
+.news-single-hero {
+  width: 100% !important;
+}
+
+/* ====== Footer ====== */
+/* 针对 footer widget 1 */
+
+#custom_html-1 {
+  padding: 20px;
+  color: #AAAAAA;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 30px;
+  min-width: 300px; /* 可根据需要调整宽度 */
+}
+
+#custom_html-1 .widget-title {
+  color: #fff;
+  font-size: 20px;
+  line-height: 24px;
+}
+
+#custom_html-1 .contact-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#custom_html-1 .contact-list li {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+#custom_html-1 .contact-list img {
+  width: 18px;
+  height: 18px;
+  margin-right: 10px;
+  margin-top: 6px;
+}
