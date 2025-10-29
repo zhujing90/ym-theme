@@ -432,3 +432,73 @@ function ym_get_product_pdf($post_id = null) {
     $pdf_id = get_post_meta($post_id, '_product_pdf_file', true);
     return $pdf_id ? wp_get_attachment_url($pdf_id) : '';
 }
+
+// ✅ 注册一个自定义小工具来显示 Product Categories
+class Product_Categories_Widget extends WP_Widget {
+  function __construct() {
+    parent::__construct(
+      'product_categories_widget', // 小工具 ID
+      __('Product Categories', 'astra-child'), // 小工具标题（显示在后台）
+      array('description' => __('Displays a list of Product Categories.', 'astra-child'))
+    );
+  }
+
+  // 前端显示的内容
+  function widget($args, $instance) {
+    echo $args['before_widget'];
+
+    // 小工具标题
+    if (!empty($instance['title'])) {
+      echo $args['before_title'] . apply_filters('widget_title', $instance['title']) . $args['after_title'];
+    } else {
+      echo $args['before_title'] . 'Product Categories' . $args['after_title'];
+    }
+
+    // 获取 Product Categories
+    $terms = get_terms(array(
+      'taxonomy' => 'product_category',
+      'parent'     => 0, 
+      'hide_empty' => false,
+    ));
+
+    if (!empty($terms) && !is_wp_error($terms)) {
+      echo '<ul class="product-category-list">';
+      foreach ($terms as $term) {
+        echo '<li><a href="' . esc_url(get_term_link($term)) . '">' . esc_html($term->name) . '</a></li>';
+      }
+      echo '</ul>';
+    } else {
+      echo '<p>No product categories found.</p>';
+    }
+
+    echo $args['after_widget'];
+  }
+
+  // 后台表单：允许自定义标题
+  function form($instance) {
+    $title = !empty($instance['title']) ? $instance['title'] : __('Product Categories', 'astra-child');
+    ?>
+    <p>
+      <label for="<?php echo esc_attr($this->get_field_id('title')); ?>">Title:</label>
+      <input class="widefat" id="<?php echo esc_attr($this->get_field_id('title')); ?>"
+             name="<?php echo esc_attr($this->get_field_name('title')); ?>"
+             type="text" value="<?php echo esc_attr($title); ?>">
+    </p>
+    <?php
+  }
+
+  // 保存设置
+  function update($new_instance, $old_instance) {
+    $instance = array();
+    $instance['title'] = (!empty($new_instance['title'])) ? strip_tags($new_instance['title']) : '';
+    return $instance;
+  }
+}
+
+// ✅ 注册小工具
+function register_product_categories_widget() {
+  register_widget('Product_Categories_Widget');
+}
+add_action('widgets_init', 'register_product_categories_widget');
+
+

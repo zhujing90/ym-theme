@@ -306,7 +306,6 @@ Template: astra
 /* 针对 footer widget 1 */
 
 #custom_html-1 {
-  padding: 20px;
   color: #AAAAAA;
   font-weight: 400;
   font-size: 16px;
@@ -337,4 +336,67 @@ Template: astra
   height: 18px;
   margin-right: 10px;
   margin-top: 6px;
+}
+
+/* ===============================
+   Product Categories Widget 样式
+   =============================== */
+
+.ast-builder-grid-row-3-equal .ast-builder-grid-row {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 1fr;
+  gap: 20px; /* 可选：增加列间距 */
+}
+
+/* 限定只对 Product Categories 小组件生效 */
+.widget_product_categories_widget {
+  margin-bottom: 30px;
+}
+
+/* 小组件标题样式 */
+.widget_product_categories_widget .widget-title {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  color: #FFFFFF !important;
+  line-height: 24px;
+  margin-bottom: 15px;
+}
+
+/* 分类列表整体 */
+.widget_product_categories_widget .product-category-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 两列布局 */
+  gap: 8px 20px; /* 上下间距8px，左右间距20px */
+}
+
+/* 每个分类项 */
+.widget_product_categories_widget .product-category-list li {
+  margin: 0;
+}
+
+/* 分类链接样式 */
+.widget_product_categories_widget .product-category-list a {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: #AAAAAA;
+  line-height: 30px;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+/* 悬停效果 */
+.widget_product_categories_widget .product-category-list a:hover {
+  color: #FFFFFF;
+}
+
+/* 小屏幕（手机）单列显示 */
+@media (max-width: 768px) {
+  .widget_product_categories_widget .product-category-list {
+    grid-template-columns: 1fr;
+  }
 }
