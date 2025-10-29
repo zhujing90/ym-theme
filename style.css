@@ -228,21 +228,78 @@ Template: astra
   }
 }
 
-/* ====== Single News Banner - 突破容器限制 ====== */
-body {
-  overflow-x: hidden !important;
+/* ====== Single News Banner - 突破容器限制（仅 single-news 页面） ====== */
+@media (min-width: 922px) {
+    .single-news .site-content .ast-container {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+.single-news .news-single-article {
+  padding: 0px !important;
 }
 
 .news-single-hero-wrapper {
+  width: 100vw;
   position: relative;
-  width: 100vw !important;
-  left: 50% !important;
-  margin-left: -50vw !important;
-  overflow: hidden !important;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
 }
 
 .news-single-hero {
-  width: 100% !important;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  height: 300px; /* 你可以改成想要的高度 */
+}
+
+/* 修正正文容器 */
+.news-single-content {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.news-center-image {
+  display: block;
+  margin: 20px auto;
+  max-width: 100%;
+  height: auto;
+}
+
+.news-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 50px 0 20px;
+  padding-top: 20px;
+}
+
+.news-nav-link {
+  font-size: 16px;
+  color: #333;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.news-nav-link:hover {
+  color: #1B77D2;
+}
+
+.news-prev {
+  padding-right: 50px;
+  text-align: left;
+  flex: 1;
+}
+
+.news-next {
+  padding-left: 50px;
+  text-align: right;
+  flex: 1;
 }
 
 /* ====== Footer ====== */

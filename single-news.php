@@ -17,26 +17,16 @@ $banner_url = get_site_url() . '/wp-content/uploads/2025/10/bg-news-single-scale
     </div>
 </div>
 
-<div class="container" style="max-width: 1200px; margin: 0 auto; padding: 30px 20px;">
+<div class="container">
     <div class="news-single-content">
         <?php
         // Breadcrumb - 支持多种breadcrumb插件
-        if (function_exists('yoast_breadcrumb')) {
-            echo '<div class="breadcrumb-wrapper" style="padding: 20px 0;">';
-            yoast_breadcrumb();
-            echo '</div>';
-        } elseif (function_exists('bcn_display')) {
-            echo '<div class="breadcrumb-wrapper" style="padding: 20px 0;">';
-            bcn_display();
-            echo '</div>';
-        } else {
-            // 自定义简单的breadcrumb
-            echo '<div class="breadcrumb-wrapper" style="padding: 20px 0;">';
-            echo '<a href="' . esc_url(home_url('/')) . '">Home</a> / ';
-            echo '<a href="' . esc_url(get_post_type_archive_link('news')) . '">News</a> / ';
-            echo '<span>' . esc_html(get_the_title()) . '</span>';
-            echo '</div>';
-        }
+        // 自定义简单的breadcrumb
+        echo '<div class="breadcrumb-wrapper" style="padding-bottom: 20px;">';
+        echo '<a href="' . esc_url(home_url('/')) . '">Home</a> > ';
+        echo '<a href="' . esc_url(get_post_type_archive_link('news')) . '">News</a> ';
+        // echo '<span>' . esc_html(get_the_title()) . '</span>';
+        echo '</div>';
         ?>
         
         <?php
@@ -64,6 +54,8 @@ $banner_url = get_site_url() . '/wp-content/uploads/2025/10/bg-news-single-scale
 
                 <div class="entry-content" style="font-family: Montserrat; font-weight: 400; font-size: 16px; color: #333333; line-height: 28px;">
                     <?php
+                    the_post_thumbnail('large', ['class' => 'news-center-image']); 
+
                     the_content();
 
                     wp_link_pages(array(
@@ -73,7 +65,26 @@ $banner_url = get_site_url() . '/wp-content/uploads/2025/10/bg-news-single-scale
                     ?>
                 </div>
             </article>
-            
+            <div class="news-navigation">
+                <div class="news-prev">
+                    <?php
+                    $prev_post = get_previous_post();
+                    if ($prev_post) {
+                        echo '<a href="' . get_permalink($prev_post->ID) . '" class="news-nav-link prev">&laquo; Prev: ' . esc_html($prev_post->post_title) . '</a>';
+                    }
+                    ?>
+                </div>
+
+                <div class="news-next">
+                    <?php
+                    $next_post = get_next_post();
+                    if ($next_post) {
+                        echo '<a href="' . get_permalink($next_post->ID) . '" class="news-nav-link next">Next: ' . esc_html($next_post->post_title) . ' &raquo;</a>';
+                    }
+                    ?>
+                </div>
+            </div>
+
         <?php
         endwhile;
         ?>
