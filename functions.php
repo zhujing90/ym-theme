@@ -86,13 +86,25 @@ add_action('add_meta_boxes', function () {
 function ym_register_product_cpt() {
   $labels = ['name' => 'Products', 'singular_name' => 'Product'];
   $args = [
-    'labels' => $labels, 'public' => true, 'has_archive' => true,
-    'menu_icon' => 'dashicons-products', 'rewrite' => ['slug' => 'products'],
+    'labels' => $labels, 
+    'public' => true, 
+    'has_archive' => true,
+    'menu_icon' => 'dashicons-products', 
+    'rewrite' => ['slug' => 'products'],
     'supports' => ['title', 'editor', 'thumbnail', 'excerpt'],
+    'show_in_nav_menus' => true, // 确保在菜单中可见
   ];
   register_post_type('product', $args);
+  
   register_taxonomy('product_category', 'product', [
-    'label' => 'Product Categories', 'hierarchical' => true, 'rewrite' => ['slug' => 'product-category']
+    'label' => 'Product Categories', 
+    'hierarchical' => true, 
+    'rewrite' => ['slug' => 'product-category'],
+    'show_admin_column' => true,
+    'show_ui' => true,
+    'show_in_nav_menus' => true, // 确保在菜单中可见
+    'public' => true, // 确保是公开的
+    'publicly_queryable' => true, // 可以公开查询
   ]);
 }
 add_action('init', 'ym_register_product_cpt');
@@ -501,4 +513,25 @@ function register_product_categories_widget() {
 }
 add_action('widgets_init', 'register_product_categories_widget');
 
+// 确保 Product Categories 在菜单编辑器中显示
+function ym_ensure_product_category_in_menu() {
+  $taxonomy = get_taxonomy('product_category');
+  if ($taxonomy) {
+    $taxonomy->show_in_nav_menus = true;
+  }
+}
+add_action('admin_init', 'ym_ensure_product_category_in_menu');
+
+// 在菜单编辑器页面强制显示 Product Categories
+add_filter('nav_menu_meta_box_object', function($object) {
+  if (isset($object->name) && $object->name === 'product_category') {
+    $object->_default_query = array('orderby' => 'name');
+    // 确保分类法参数正确
+    $taxonomy = get_taxonomy('product_category');
+    if ($taxonomy) {
+      $object->labels = $taxonomy->labels;
+    }
+  }
+  return $object;
+});
 
