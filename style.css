@@ -388,7 +388,7 @@ Template: astra
 
 /* ====== Single News Banner - 突破容器限制（仅 single-news 页面） ====== */
 @media (min-width: 922px) {
-    .single-news .site-content .ast-container {
+    .single-news .site-content .ast-container, .post-type-archive-product .site-content .ast-container {
         display: flex;
         flex-direction: column;
     }
@@ -398,7 +398,7 @@ Template: astra
   padding: 0px !important;
 }
 
-.news-single-hero-wrapper {
+.news-single-hero-wrapper, .product-hero-wrapper {
   width: 100vw;
   position: relative;
   left: 50%;
@@ -407,7 +407,7 @@ Template: astra
   margin-right: -50vw;
 }
 
-.news-single-hero {
+.news-single-hero, .product-hero {
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
@@ -415,7 +415,7 @@ Template: astra
 }
 
 /* 修正正文容器 */
-.news-single-content {
+.news-single-content, .products-archive-content {
   max-width: 1180px;
   margin: 0 auto;
   padding: 20px;

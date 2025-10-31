@@ -244,15 +244,15 @@ function ym_product_details_callback($post) {
     echo '</div>';
     
     // Content Description (Detailed)
-    $content_desc = get_post_meta($post->ID, '_product_content_description', true);
-    echo '<div style="margin-bottom: 20px;">';
-    echo '<label for="product_content_description"><strong>Content Description</strong></label><br>';
-    wp_editor($content_desc, 'product_content_description', array(
-        'textarea_name' => 'product_content_description',
-        'media_buttons' => false,
-        'textarea_rows' => 10
-    ));
-    echo '</div>';
+    // $content_desc = get_post_meta($post->ID, '_product_content_description', true);
+    // echo '<div style="margin-bottom: 20px;">';
+    // echo '<label for="product_content_description"><strong>Content Description</strong></label><br>';
+    // wp_editor($content_desc, 'product_content_description', array(
+    //     'textarea_name' => 'product_content_description',
+    //     'media_buttons' => false,
+    //     'textarea_rows' => 10
+    // ));
+    // echo '</div>';
     
     // Gallery Images
     echo '<div style="margin-bottom: 20px;">';
