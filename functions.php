@@ -535,3 +535,24 @@ add_filter('nav_menu_meta_box_object', function($object) {
   return $object;
 });
 
+
+add_filter( 'document_title_parts', function( $title ) {
+
+    // 如果是产品归档页（archive-product.php）
+    if ( is_post_type_archive( 'product' ) ) {
+        $title['title'] = 'Our Products'; // 自定义标题
+    }
+
+    // 如果是单个产品页面
+    if ( is_singular( 'product' ) ) {
+        $title['title'] = 'Product Details | '.get_the_title(); // 显示产品名 + 后缀
+    }
+
+    // 如果是产品分类页面
+    if ( is_tax( 'product_category' ) ) {
+        $term = get_queried_object();
+        $title['title'] = 'Product Category: ' . $term->name; // 分类名称
+    }
+
+    return $title;
+});

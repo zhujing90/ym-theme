@@ -390,7 +390,8 @@ Template: astra
 @media (min-width: 922px) {
     .single-news .site-content .ast-container, 
     .post-type-archive-product .site-content .ast-container, 
-    .tax-product_category .site-content .ast-container{
+    .tax-product_category .site-content .ast-container,
+    .single-product .site-content .ast-container{
         display: flex;
         flex-direction: column;
     }
