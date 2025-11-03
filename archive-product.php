@@ -40,23 +40,47 @@ $product_banner_url = get_site_url() . '/wp-content/uploads/2025/10/products-ban
                 <h2 style="margin: 0 0 12px; font-size: 16px; font-weight: 600;">Categories</h2>
                 <ul style="list-style: none; padding: 0; margin: 0;">
                     <?php
+                    // 获取所有分类（包含层级关系）
                     $terms = get_terms( [
                         'taxonomy'   => 'product_category',
-                        'hide_empty' => true,
+                        'hide_empty' => false,
+                        'parent'     => 0, // 只获取顶级分类
                     ] );
 
-                    if ( ! is_wp_error( $terms ) ) {
-                        $current_term_id = is_tax( 'product_category' ) ? get_queried_object_id() : 0;
+                    // 递归显示分类及其子分类
+                    function display_category_tree( $parent_id = 0, $level = 0, $current_term_id = 0 ) {
+                        $terms = get_terms( [
+                            'taxonomy'   => 'product_category',
+                            'hide_empty' => false,
+                            'parent'     => $parent_id,
+                        ] );
+
+                        if ( is_wp_error( $terms ) || empty( $terms ) ) {
+                            return;
+                        }
+
                         foreach ( $terms as $term ) {
                             $is_active = $current_term_id === (int) $term->term_id;
                             $term_link = get_term_link( $term );
-                            echo '<li style="margin: 6px 0;">'
-                            . '<a href="' . esc_url( $term_link ) . '"'
-                            . ' style="display:block; padding:8px 10px; border:1px solid #eee; border-radius:4px; text-decoration:none; color:#222;'
-                            . ( $is_active ? ' background:#f2f7ff; border-color:#cfe3ff;' : '' )
-                            . '">' . esc_html( $term->name ) . '</a>'
-                            . '</li>';
+                            $padding_left = $level * 20; // 每级缩进20px
+                            
+                            echo '<li style="margin: 6px 0;">';
+                            echo '<a href="' . esc_url( $term_link ) . '"';
+                            echo ' style="display:block; padding:8px 10px; padding-left:' . ( 10 + $padding_left ) . 'px; border:1px solid #eee; border-radius:4px; text-decoration:none; color:#222;';
+                            if ( $is_active ) {
+                                echo ' background:#f2f7ff; border-color:#cfe3ff;';
+                            }
+                            echo '">' . esc_html( $term->name ) . '</a>';
+                            echo '</li>';
+                            
+                            // 递归显示子分类
+                            display_category_tree( $term->term_id, $level + 1, $current_term_id );
                         }
+                    }
+
+                    if ( ! is_wp_error( $terms ) ) {
+                        $current_term_id = is_tax( 'product_category' ) ? get_queried_object_id() : 0;
+                        display_category_tree( 0, 0, $current_term_id );
                     }
                     ?>
                 </ul>
