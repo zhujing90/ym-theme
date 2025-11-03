@@ -36,9 +36,9 @@ $product_banner_url = get_site_url() . '/wp-content/uploads/2025/10/products-ban
         <div class="products-archive" style="display: grid; grid-template-columns: 260px 1fr; gap: 30px; align-items: start;">
 
             <!-- Left: Product Categories -->
-            <aside class="product-categories" style="background: #fff; border: 1px solid #eee; padding: 16px;">
-                <h2 style="margin: 0 0 12px; font-size: 16px; font-weight: 600;">Categories</h2>
-                <ul style="list-style: none; padding: 0; margin: 0;">
+            <aside class="product-categories">
+                <!-- <h2 style="margin: 0 0 12px; font-size: 16px; font-weight: 600;">Categories</h2> -->
+                <ul class="product-category-list">
                     <?php
                     // 获取所有分类（包含层级关系）
                     $terms = get_terms( [
@@ -47,8 +47,22 @@ $product_banner_url = get_site_url() . '/wp-content/uploads/2025/10/products-ban
                         'parent'     => 0, // 只获取顶级分类
                     ] );
 
+                    // 检查当前激活的分类是否是一级分类或其子分类
+                    $current_term_id = is_tax( 'product_category' ) ? get_queried_object_id() : 0;
+                    $current_term = $current_term_id ? get_term( $current_term_id ) : null;
+                    $active_parent_id = 0;
+                    if ( $current_term && ! is_wp_error( $current_term ) ) {
+                        // 如果是子分类，找到其顶级父分类
+                        $term_obj = $current_term;
+                        while ( $term_obj->parent != 0 ) {
+                            $term_obj = get_term( $term_obj->parent );
+                            if ( is_wp_error( $term_obj ) ) break;
+                        }
+                        $active_parent_id = $term_obj->term_id;
+                    }
+
                     // 递归显示分类及其子分类
-                    function display_category_tree( $parent_id = 0, $level = 0, $current_term_id = 0 ) {
+                    function display_category_tree( $parent_id = 0, $level = 0, $current_term_id = 0, $active_parent_id = 0 ) {
                         $terms = get_terms( [
                             'taxonomy'   => 'product_category',
                             'hide_empty' => false,
@@ -61,26 +75,47 @@ $product_banner_url = get_site_url() . '/wp-content/uploads/2025/10/products-ban
 
                         foreach ( $terms as $term ) {
                             $is_active = $current_term_id === (int) $term->term_id;
+                            $is_active_parent = $active_parent_id === (int) $term->term_id;
                             $term_link = get_term_link( $term );
-                            $padding_left = $level * 20; // 每级缩进20px
                             
-                            echo '<li style="margin: 6px 0;">';
-                            echo '<a href="' . esc_url( $term_link ) . '"';
-                            echo ' style="display:block; padding:8px 10px; padding-left:' . ( 10 + $padding_left ) . 'px; border:1px solid #eee; border-radius:4px; text-decoration:none; color:#222;';
-                            if ( $is_active ) {
-                                echo ' background:#f2f7ff; border-color:#cfe3ff;';
+                            $class = '';
+                            if ( $level == 0 ) {
+                                $class = 'category-level-1';
+                                if ( $is_active || $is_active_parent ) {
+                                    $class .= ' active';
+                                }
+                            } else {
+                                $class = 'category-level-2';
+                                if ( $is_active ) {
+                                    $class .= ' active';
+                                }
                             }
-                            echo '">' . esc_html( $term->name ) . '</a>';
+                            
+                            echo '<li class="' . esc_attr( $class ) . '">';
+                            echo '<a href="' . esc_url( $term_link ) . '" class="category-link">';
+                            echo esc_html( $term->name );
+                            echo '</a>';
                             echo '</li>';
                             
-                            // 递归显示子分类
-                            display_category_tree( $term->term_id, $level + 1, $current_term_id );
+                            // 如果有子分类，需要包裹一个容器来设置背景色
+                            $has_children = get_terms( [
+                                'taxonomy'   => 'product_category',
+                                'hide_empty' => false,
+                                'parent'     => $term->term_id,
+                                'number'     => 1,
+                            ] );
+                            
+                            if ( ! is_wp_error( $has_children ) && ! empty( $has_children ) ) {
+                                $sub_class = ( $is_active || $is_active_parent ) ? 'sub-categories active-parent' : 'sub-categories';
+                                echo '<ul class="' . esc_attr( $sub_class ) . '">';
+                                display_category_tree( $term->term_id, $level + 1, $current_term_id, $active_parent_id );
+                                echo '</ul>';
+                            }
                         }
                     }
 
                     if ( ! is_wp_error( $terms ) ) {
-                        $current_term_id = is_tax( 'product_category' ) ? get_queried_object_id() : 0;
-                        display_category_tree( 0, 0, $current_term_id );
+                        display_category_tree( 0, 0, $current_term_id, $active_parent_id );
                     }
                     ?>
                 </ul>
@@ -90,19 +125,48 @@ $product_banner_url = get_site_url() . '/wp-content/uploads/2025/10/products-ban
             <section>
                 <?php if ( have_posts() ) : ?>
                     <div class="product-grid" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px;">
-                        <?php while ( have_posts() ) : the_post(); ?>
-                            <article id="post-<?php the_ID(); ?>" <?php post_class('product-card'); ?> style="background:#fff; border:1px solid #eee; border-radius:4px; overflow:hidden;">
-                                <a href="<?php the_permalink(); ?>" style="display:block; text-decoration:none; color:inherit;">
-                                    <div class="product-thumb" style="aspect-ratio: 4/3; width:100%; background:#fafafa; display:flex; align-items:center; justify-content:center;">
+                        <?php while ( have_posts() ) : the_post(); 
+                            // 获取产品分类
+                            $terms = get_the_terms( get_the_ID(), 'product_category' );
+                            $category_name = '';
+                            if ( $terms && ! is_wp_error( $terms ) ) {
+                                $category_name = $terms[0]->name;
+                            }
+                        ?>
+                            <article id="post-<?php the_ID(); ?>" <?php post_class('product-card'); ?>>
+                                <a href="<?php the_permalink(); ?>" class="product-card-link">
+                                    <div class="product-thumb">
                                         <?php if ( has_post_thumbnail() ) {
-                                            the_post_thumbnail( 'medium', [ 'style' => 'width:100%; height:auto; object-fit:cover;' ] );
+                                            the_post_thumbnail( 'medium' );
                                         } else {
-                                            echo '<div style="height:100%; width:100%; background:#f5f5f5;"></div>';
+                                            echo '<div class="product-placeholder"></div>';
                                         } ?>
                                     </div>
-                                    <h3 class="product-title" style="margin:12px; font-family: Montserrat; font-weight: 400; font-size: 16px; color: #000000; line-height: 24px;">
-                                        <?php the_title(); ?>
-                                    </h3>
+                                    
+                                    <!-- Hover 覆盖层 -->
+                                    <div class="product-hover-overlay">
+                                        <div class="product-hover-content">
+                                            <svg class="product-search-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <circle cx="11" cy="11" r="8" stroke="white" stroke-width="2" fill="none"/>
+                                                <path d="m21 21-4.35-4.35" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                                            </svg>
+                                            <?php if ( $category_name ) : ?>
+                                                <div class="product-category-name"><?php echo esc_html( $category_name ); ?></div>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="product-title-wrapper">
+                                        <h3 class="product-title">
+                                            <?php the_title(); ?>
+                                        </h3>
+                                        <div class="product-view-more">
+                                            <span>View More</span>
+                                            <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M5 12h14M12 5l7 7-7 7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                        </div>
+                                    </div>
                                 </a>
                             </article>
                         <?php endwhile; ?>

@@ -12,7 +12,7 @@ Template: astra
 
 /* 全局字体 - 排除SVG元素和i标签 */
 *:not(svg):not(svg *):not(i):not(i *) {
-  font-family: Montserrat !important;
+  font-family: Montserrat ;
 }
 
 .ast-above-header-wrap {
@@ -388,7 +388,9 @@ Template: astra
 
 /* ====== Single News Banner - 突破容器限制（仅 single-news 页面） ====== */
 @media (min-width: 922px) {
-    .single-news .site-content .ast-container, .post-type-archive-product .site-content .ast-container {
+    .single-news .site-content .ast-container, 
+    .post-type-archive-product .site-content .ast-container, 
+    .tax-product_category .site-content .ast-container{
         display: flex;
         flex-direction: column;
     }
@@ -670,4 +672,252 @@ Template: astra
   .product-category-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* ====== Product Archive Categories Sidebar ====== */
+.product-categories {
+  background: #F6F6F6;
+  border: none;
+  padding: 0;
+  font-weight: 400;
+  font-size: 16px;
+  color: #333333;
+  line-height: 60px;
+}
+
+.product-category-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.product-category-list li {
+  margin: 0;
+  line-height: 60px;
+}
+
+.product-category-list .category-link {
+  display: block;
+  padding: 0 15px;
+  text-decoration: none;
+  font-weight: 400;
+  font-size: 16px;
+  color: #333333;
+  line-height: 60px;
+  transition: all 0.3s ease;
+}
+
+/* 一级分类 */
+.category-level-1 .category-link {
+  font-weight: 400;
+  font-size: 16px;
+  color: #333333;
+  line-height: 60px;
+}
+
+/* 激活的一级分类 */
+.category-level-1.active .category-link {
+  font-weight: 400;
+  font-size: 16px;
+  color: #FFFFFF;
+  line-height: 60px;
+  background: #1976D2;
+}
+
+.category-level-1 .category-link:hover  {
+  background: #1976D2;
+  color: #FFFFFF;
+}
+
+/* 激活的一级分类对应的所有二级分类区域 */
+.sub-categories.active-parent {
+  background: #FFFFFF;
+}
+
+/* 二级分类 */
+.category-level-2 .category-link {
+  padding-left: 30px;
+  position: relative;
+}
+
+/* 激活的二级分类 - 添加竖线 */
+.category-level-2.active .category-link {
+  position: relative;
+  background: rgba(48, 131, 214, 0.1);
+}
+
+.category-level-2.active .category-link::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: #3083D6;
+}
+
+/* 二级分类 hover 效果 */
+.category-level-2 .category-link:hover {
+  background: rgba(48, 131, 214, 0.1);
+}
+
+.sub-categories {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* ====== Product Card Styles ====== */
+.product-card {
+  background: #FFFFFF;
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+  height: 400px;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+  transition: all 0.3s ease;
+  padding: 0px !important;
+}
+
+.product-card-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 图片区域 */
+.product-thumb {
+  flex: 1;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.product-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: opacity 0.3s ease;
+}
+
+.product-placeholder {
+  width: 100%;
+  height: 100%;
+  background: #f5f5f5;
+}
+
+/* Hover 覆盖层 */
+.product-hover-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 64px; /* 留出标题区域 */
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 2;
+}
+
+.product-hover-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.product-search-icon {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.product-category-name {
+  color: #FFFFFF;
+  font-family: Montserrat;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* 标题区域 */
+.product-title-wrapper {
+  background: #F6F6F6;
+  padding: 12px 0px;
+  text-align: center;
+  min-height: 64px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+}
+
+.product-title {
+  font-family: Montserrat;
+  font-weight: 400;
+  font-size: 16px;
+  color: #000000;
+  line-height: 32px;
+  margin: 0;
+}
+
+.product-view-more {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  color: #FFFFFF;
+  font-family: Montserrat;
+  font-weight: 400;
+  font-size: 14px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  margin-top: 8px;
+}
+
+.arrow-icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* Hover 效果 */
+.product-card:hover {
+  background: #1976D2;
+  opacity: 0.9;
+}
+
+.product-card:hover .product-thumb img {
+  opacity: 0.3;
+}
+
+.product-card:hover .product-hover-overlay {
+  opacity: 1;
+}
+
+.product-card:hover .product-search-icon,
+.product-card:hover .product-category-name {
+  opacity: 1;
+}
+
+.product-card:hover .product-title-wrapper {
+  background: rgba(25, 118, 210, 0.1);
+}
+
+.product-card:hover .product-title {
+  color: #FFFFFF;
+}
+
+.product-card:hover .product-view-more {
+  opacity: 1;
 }
