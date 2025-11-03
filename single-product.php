@@ -145,73 +145,82 @@ $product_banner_url = get_site_url() . '/wp-content/uploads/2025/10/products-ban
             <!-- Right: Product Detail -->
             <section>
                 <article class="single-product-detail">
-                    <header class="single-product-header">
+                    <div class="product-detail-grid">
                         <?php
-                        $term_names = [];
-                        if ( $product_terms_for_active && ! is_wp_error( $product_terms_for_active ) ) {
-                            foreach ( $product_terms_for_active as $t ) { $term_names[] = $t->name; }
+                        // 准备图片：特色图 + 画廊
+                        $images = [];
+                        if ( has_post_thumbnail() ) {
+                            $images[] = get_post_thumbnail_id();
                         }
-                        if ( ! empty( $term_names ) ) {
-                            echo '<div class="single-product-category">' . esc_html( implode( ', ', $term_names ) ) . '</div>';
+                        $gallery_ids = get_post_meta( get_the_ID(), '_product_gallery_images', true );
+                        if ( ! empty( $gallery_ids ) ) {
+                            $ids = array_filter( array_map( 'intval', explode( ',', $gallery_ids ) ) );
+                            foreach ( $ids as $img_id ) {
+                                if ( ! in_array( $img_id, $images, true ) ) { $images[] = $img_id; }
+                            }
                         }
                         ?>
-                        <h1 class="single-product-title"><?php the_title(); ?></h1>
-                    </header>
 
-                    <?php
-                    // 准备图片：特色图 + 画廊
-                    $images = [];
-                    if ( has_post_thumbnail() ) {
-                        $images[] = get_post_thumbnail_id();
-                    }
-                    $gallery_ids = get_post_meta( get_the_ID(), '_product_gallery_images', true );
-                    if ( ! empty( $gallery_ids ) ) {
-                        $ids = array_filter( array_map( 'intval', explode( ',', $gallery_ids ) ) );
-                        foreach ( $ids as $img_id ) {
-                            if ( ! in_array( $img_id, $images, true ) ) { $images[] = $img_id; }
-                        }
-                    }
-                    ?>
-
-                    <div class="product-gallery">
-                        <div class="product-gallery-thumbs">
-                            <button type="button" class="thumb-nav up" aria-label="up">▲</button>
-                            <ul>
-                                <?php foreach ( $images as $idx => $img_id ) :
-                                    $thumb = wp_get_attachment_image_src( $img_id, 'thumbnail' );
-                                    $full  = wp_get_attachment_image_src( $img_id, 'large' );
+                        <!-- 左侧：图廊 -->
+                        <div class="product-gallery">
+                            <div class="product-gallery-thumbs">
+                                <button type="button" class="thumb-nav up" aria-label="up">▲</button>
+                                <ul>
+                                    <?php foreach ( $images as $idx => $img_id ) :
+                                        $thumb = wp_get_attachment_image_src( $img_id, 'thumbnail' );
+                                        $full  = wp_get_attachment_image_src( $img_id, 'large' );
+                                    ?>
+                                        <li>
+                                            <a href="#" class="product-thumb-item<?php echo $idx === 0 ? ' active' : ''; ?>" data-full="<?php echo esc_url( $full[0] ); ?>">
+                                                <img src="<?php echo esc_url( $thumb[0] ); ?>" alt="thumb">
+                                            </a>
+                                        </li>
+                                    <?php endforeach; ?>
+                                </ul>
+                                <button type="button" class="thumb-nav down" aria-label="down">▼</button>
+                            </div>
+                            <div class="product-gallery-main">
+                                <?php if ( ! empty( $images ) ) :
+                                    $first = wp_get_attachment_image_src( $images[0], 'full' );
                                 ?>
-                                    <li>
-                                        <a href="#" class="product-thumb-item<?php echo $idx === 0 ? ' active' : ''; ?>" data-full="<?php echo esc_url( $full[0] ); ?>">
-                                            <img src="<?php echo esc_url( $thumb[0] ); ?>" alt="thumb">
-                                        </a>
-                                    </li>
-                                <?php endforeach; ?>
-                            </ul>
-                            <button type="button" class="thumb-nav down" aria-label="down">▼</button>
+                                    <img id="product-main-image" src="<?php echo esc_url( $first[0] ); ?>" alt="product" />
+                                <?php else : ?>
+                                    <div class="product-main-placeholder"></div>
+                                <?php endif; ?>
+                            </div>
                         </div>
-                        <div class="product-gallery-main">
-                            <?php if ( ! empty( $images ) ) :
-                                $first = wp_get_attachment_image_src( $images[0], 'full' );
+
+                        <!-- 右侧：标题区（分类、标题、短描述、PDF按钮） -->
+                        <div class="single-product-header">
+                            <?php
+                            $term_names = [];
+                            if ( $product_terms_for_active && ! is_wp_error( $product_terms_for_active ) ) {
+                                foreach ( $product_terms_for_active as $t ) { $term_names[] = $t->name; }
+                            }
+                            if ( ! empty( $term_names ) ) {
+                                echo '<div class="single-product-category">' . esc_html( implode( ', ', $term_names ) ) . '</div>';
+                            }
                             ?>
-                                <img id="product-main-image" src="<?php echo esc_url( $first[0] ); ?>" alt="product" />
-                            <?php else : ?>
-                                <div class="product-main-placeholder"></div>
-                            <?php endif; ?>
+                            <h1 class="single-product-title"><?php the_title(); ?></h1>
+                            <?php
+                            $short_desc = get_post_meta( get_the_ID(), '_product_short_description', true );
+                            if ( ! empty( $short_desc ) ) {
+                                echo '<div class="single-product-shortdesc">' . wp_kses_post( nl2br( $short_desc ) ) . '</div>';
+                            }
+                            $pdf_id = get_post_meta( get_the_ID(), '_product_pdf_file', true );
+                            if ( $pdf_id ) {
+                                $pdf_url = wp_get_attachment_url( $pdf_id );
+                                echo '<p class="product-pdf"><a class="product-pdf-button" href="' . esc_url( $pdf_url ) . '" target="_blank" rel="noopener">Download PDF</a></p>';
+                            }
+                            ?>
                         </div>
                     </div>
                 </article>
+
                 <div class="single-product-body">
                   <div class="single-product-content">
                       <?php the_content(); ?>
                   </div>
-                  <?php
-                  $pdf_id = get_post_meta( get_the_ID(), '_product_pdf_file', true );
-                  if ( $pdf_id ) {
-                      $pdf_url = wp_get_attachment_url( $pdf_id );
-                      echo '<p class="product-pdf"><a class="product-pdf-button" href="' . esc_url( $pdf_url ) . '" target="_blank" rel="noopener">Download PDF</a></p>';
-                  }
-                  ?>
               </div>
             </section>
 
