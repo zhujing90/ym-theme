@@ -308,15 +308,15 @@ $download_icon_url = get_site_url() . '/wp-content/uploads/2025/10/b01.png';
     
     // 滚动到当前选中的缩略图
     if (isMobile) {
-      // 移动端：横向滚动，确保当前缩略图可见
+      // 移动端：横向滚动，确保当前缩略图可见（显示3个缩略图）
       var thumbItem = activeLink.closest('li');
-      if (thumbItem) {
+      if (thumbItem && thumbContainer) {
         var itemLeft = thumbItem.offsetLeft;
-        var itemWidth = thumbItem.offsetWidth;
+        var itemWidth = thumbItem.offsetWidth; // 80px
         var containerWidth = thumbContainer.clientWidth;
-        var scrollLeft = thumbContainer.scrollLeft;
         
         // 计算需要滚动的位置，确保当前项在可见区域内
+        // 如果容器显示3个缩略图，当前项应该在中间位置
         var targetScroll = itemLeft - (containerWidth - itemWidth) / 2;
         thumbContainer.scrollLeft = Math.max(0, Math.min(targetScroll, maxScroll));
       }

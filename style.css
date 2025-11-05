@@ -476,6 +476,10 @@ body {
   border-top-color: #181a1b;
 }
 
+.site-footer .product-category-list li {
+  line-height: 28px !important;
+}
+
 /* 针对 footer widget 1 */
 
 #custom_html-1 {
@@ -1153,53 +1157,140 @@ body {
   
   .product-gallery {
     grid-template-columns: 1fr !important;
-    gap: 12px !important;
+    gap: 16px !important;
+    display: grid !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
 
+  /* 移动端：main 图片先显示 */
   .product-gallery-main {
+    order: 1 !important;
     width: 100% !important;
     max-width: 100% !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     background: #fafafa !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
   .product-gallery-main img {
     width: 100% !important;
+    max-width: 100% !important;
     height: auto !important;
     object-fit: contain !important;
+    display: block !important;
   }
 
+  /* 移动端：thumbs 图片后显示，横向排列 */
   .product-gallery-thumbs {
+    order: 2 !important;
+    display: flex !important;
     flex-direction: row !important;
     justify-content: center !important;
     align-items: center !important;
     gap: 8px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 10px 0 !important;
   }
 
+  /* 移动端缩略图滚动容器 - 显示3个（每个80px + gap） */
   .product-gallery-thumbs .thumb-scroll-container {
+    flex: 1 !important;
+    /* 容器宽度：3个缩略图（80px * 3） + 2个gap（8px * 2） = 256px */
+    width: 256px !important;
+    max-width: 256px !important;
     overflow-x: auto !important;
-    display: flex !important;
+    overflow-y: hidden !important;
+    scroll-behavior: smooth !important;
+    -webkit-overflow-scrolling: touch !important;
     scroll-snap-type: x mandatory !important;
+    box-sizing: border-box !important;
+  }
+
+  .product-gallery-thumbs .thumb-scroll-container::-webkit-scrollbar {
+    display: none !important;
   }
 
   .product-gallery-thumbs ul {
     display: flex !important;
+    flex-direction: row !important;
     gap: 8px !important;
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: max-content !important;
   }
 
+  /* 移动端缩略图保持 80px x 80px */
   .product-gallery-thumbs li {
     flex-shrink: 0 !important;
     width: 80px !important;
+    min-width: 80px !important;
+    max-width: 80px !important;
     height: 80px !important;
+    scroll-snap-align: start !important;
+  }
+
+  .product-gallery-thumbs li a {
+    display: block !important;
+    width: 80px !important;
+    height: 80px !important;
+    border: 1px solid #EEE !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  .product-gallery-thumbs li a.active {
+    border-color: #1882B3 !important;
+  }
+
+  .product-gallery-thumbs li img {
+    width: 80px !important;
+    height: 80px !important;
+    object-fit: cover !important;
+    display: block !important;
+  }
+
+  /* 移动端导航按钮样式 */
+  .product-gallery-thumbs .thumb-nav {
+    flex-shrink: 0 !important;
+    width: 32px !important;
+    height: 32px !important;
+    background: rgba(0, 0, 0, 0.1) !important;
+    border: none !important;
+    border-radius: 50% !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 0 !important; /* 隐藏原始符号 */
+    padding: 0 !important;
+    transition: background 0.3s ease !important;
+  }
+
+  .product-gallery-thumbs .thumb-nav:hover {
+    background: rgba(0, 0, 0, 0.2) !important;
   }
 
   .product-gallery-thumbs .thumb-nav.up::before {
     content: "←" !important;
+    font-size: 18px !important;
+    color: #333 !important;
+    line-height: 1 !important;
   }
+
   .product-gallery-thumbs .thumb-nav.down::before {
     content: "→" !important;
+    font-size: 18px !important;
+    color: #333 !important;
+    line-height: 1 !important;
   }
 
   .single-product-header {
