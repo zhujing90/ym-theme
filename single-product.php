@@ -257,22 +257,37 @@ $download_icon_url = get_site_url() . '/wp-content/uploads/2025/10/b01.png';
   if(!main || !thumbList || !thumbContainer) return;
   
   var links = document.querySelectorAll('.product-thumb-item');
-  var scrollStep = 88; // 每次滚动88px（80px图片 + 8px gap）
-  var maxScroll = 0;
   var currentIndex = 0;
+  var isMobile = window.innerWidth <= 768;
+  var maxScroll = 0;
+  
+  // 检测是否为移动端
+  function checkMobile() {
+    isMobile = window.innerWidth <= 768;
+    updateScrollLimits();
+  }
   
   // 计算最大滚动距离
   function updateScrollLimits() {
-    if (thumbList && thumbContainer) {
+    if (!thumbList || !thumbContainer) return;
+    
+    if (isMobile) {
+      // 移动端：横向滚动
+      var containerWidth = thumbContainer.clientWidth;
+      var listWidth = thumbList.scrollWidth;
+      maxScroll = Math.max(0, listWidth - containerWidth);
+    } else {
+      // 桌面端：纵向滚动
       maxScroll = Math.max(0, thumbList.scrollHeight - thumbContainer.clientHeight);
-      updateNavButtons();
     }
+    updateNavButtons();
   }
   
   // 更新导航按钮状态
   function updateNavButtons() {
-    if (navUp) navUp.style.opacity = currentIndex > 0 ? '1' : '0.3';
-    if (navDown) navDown.style.opacity = currentIndex < links.length - 1 ? '1' : '0.3';
+    if (!navUp || !navDown) return;
+    navUp.style.opacity = currentIndex > 0 ? '1' : '0.3';
+    navDown.style.opacity = currentIndex < links.length - 1 ? '1' : '0.3';
   }
   
   // 切换到指定索引的图片
@@ -292,9 +307,25 @@ $download_icon_url = get_site_url() . '/wp-content/uploads/2025/10/b01.png';
     activeLink.classList.add('active');
     
     // 滚动到当前选中的缩略图
-    var itemHeight = 88; // 80px + 8px gap
-    var scrollTo = index * itemHeight;
-    thumbContainer.scrollTop = scrollTo;
+    if (isMobile) {
+      // 移动端：横向滚动，确保当前缩略图可见
+      var thumbItem = activeLink.closest('li');
+      if (thumbItem) {
+        var itemLeft = thumbItem.offsetLeft;
+        var itemWidth = thumbItem.offsetWidth;
+        var containerWidth = thumbContainer.clientWidth;
+        var scrollLeft = thumbContainer.scrollLeft;
+        
+        // 计算需要滚动的位置，确保当前项在可见区域内
+        var targetScroll = itemLeft - (containerWidth - itemWidth) / 2;
+        thumbContainer.scrollLeft = Math.max(0, Math.min(targetScroll, maxScroll));
+      }
+    } else {
+      // 桌面端：纵向滚动
+      var itemHeight = 88; // 80px + 8px gap
+      var scrollTo = index * itemHeight;
+      thumbContainer.scrollTop = scrollTo;
+    }
     updateNavButtons();
   }
   
@@ -306,7 +337,7 @@ $download_icon_url = get_site_url() . '/wp-content/uploads/2025/10/b01.png';
     });
   });
   
-  // 向上滚动并切换图片
+  // 导航按钮点击事件
   if (navUp) {
     navUp.addEventListener('click', function(e){
       e.preventDefault();
@@ -316,7 +347,6 @@ $download_icon_url = get_site_url() . '/wp-content/uploads/2025/10/b01.png';
     });
   }
   
-  // 向下滚动并切换图片
   if (navDown) {
     navDown.addEventListener('click', function(e){
       e.preventDefault();
@@ -329,9 +359,10 @@ $download_icon_url = get_site_url() . '/wp-content/uploads/2025/10/b01.png';
   // 初始化
   updateScrollLimits();
   updateNavButtons();
+  
+  // 监听窗口大小变化
   window.addEventListener('resize', function() {
-    updateScrollLimits();
-    updateNavButtons();
+    checkMobile();
   });
 })();
 </script>
