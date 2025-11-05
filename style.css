@@ -1153,161 +1153,74 @@ body {
   
   .product-gallery {
     grid-template-columns: 1fr !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-    gap: 16px !important;
-    margin: 0 !important;
-    padding: 0 !important;
+    gap: 12px !important;
   }
-  
+
   .product-gallery-main {
-    order: 1;
     width: 100% !important;
     max-width: 100% !important;
-    box-sizing: border-box !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    min-height: auto !important;
-  }
-  
-  .product-gallery-main img {
-    width: 100% !important;
-    max-width: 100% !important;
-    height: auto !important;
-    box-sizing: border-box !important;
-    display: block !important;
-  }
-  
-  /* 移动端缩略图保持和桌面端一样的大小（80px x 80px） */
-  .product-gallery-thumbs {
-    order: 2;
-    flex-direction: row !important;
+    display: flex !important;
     align-items: center !important;
     justify-content: center !important;
+    background: #fafafa !important;
+  }
+
+  .product-gallery-main img {
     width: 100% !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-    padding: 10px 0 !important;
-    gap: 8px !important;
-    margin: 0 !important;
-  }
-  
-  /* 移动端缩略图容器 - 横向显示3个，每个80px */
-  .thumb-scroll-container {
-    flex: 1 !important;
-    width: calc(100% - 80px) !important; /* 减去左右按钮的宽度（32px + 8px gap）* 2 */
-    max-width: calc(100% - 80px) !important;
     height: auto !important;
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-    scroll-snap-type: x mandatory;
-    box-sizing: border-box !important;
+    object-fit: contain !important;
   }
-  
-  .thumb-scroll-container::-webkit-scrollbar {
-    display: none;
-  }
-  
-  .product-gallery-thumbs ul {
+
+  .product-gallery-thumbs {
     flex-direction: row !important;
-    width: max-content !important;
-    box-sizing: border-box !important;
+    justify-content: center !important;
+    align-items: center !important;
     gap: 8px !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    display: flex !important;
   }
-  
-  /* 移动端缩略图尺寸 - 保持和桌面端一样 80px x 80px */
+
+  .product-gallery-thumbs .thumb-scroll-container {
+    overflow-x: auto !important;
+    display: flex !important;
+    scroll-snap-type: x mandatory !important;
+  }
+
+  .product-gallery-thumbs ul {
+    display: flex !important;
+    gap: 8px !important;
+  }
+
   .product-gallery-thumbs li {
     flex-shrink: 0 !important;
     width: 80px !important;
-    min-width: 80px !important;
-    max-width: 80px !important;
-    scroll-snap-align: start;
-  }
-  
-  .product-gallery-thumbs li a {
-    width: 80px !important;
     height: 80px !important;
-    padding: 0 !important;
-    box-sizing: border-box !important;
   }
-  
-  .product-gallery-thumbs img {
-    width: 80px !important;
-    height: 80px !important;
-    object-fit: cover !important;
-    display: block !important;
-  }
-  
-  /* 移动端导航按钮样式 */
-  .product-gallery-thumbs .thumb-nav {
-    flex-shrink: 0 !important;
-    width: 32px !important;
-    height: 32px !important;
-    font-size: 18px !important;
-    padding: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    background: rgba(0, 0, 0, 0.1) !important;
-    border-radius: 50% !important;
-    color: #333 !important;
-  }
-  
-  .product-gallery-thumbs .thumb-nav:hover {
-    background: rgba(0, 0, 0, 0.2) !important;
-  }
-  
-  /* 移动端按钮改为左右箭头 */
+
   .product-gallery-thumbs .thumb-nav.up::before {
-    content: '←' !important;
+    content: "←" !important;
   }
-  
   .product-gallery-thumbs .thumb-nav.down::before {
-    content: '→' !important;
+    content: "→" !important;
   }
-  
-  .product-gallery-thumbs .thumb-nav.up,
-  .product-gallery-thumbs .thumb-nav.down {
-    font-size: 0 !important; /* 隐藏原来的▲▼符号 */
-  }
-  
+
   .single-product-header {
-    width: 100% !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-    padding: 0 !important;
+    padding: 0 5px !important;
+    text-align: left !important;
   }
-  
+
   .single-product-title {
     font-size: 20px !important;
     line-height: 1.4 !important;
     word-wrap: break-word !important;
-    overflow-wrap: break-word !important;
   }
-  
+
   .single-product-shortdesc {
     font-size: 14px !important;
     line-height: 1.6 !important;
-    word-wrap: break-word !important;
-    overflow-wrap: break-word !important;
   }
-  
-  .product-pdf {
-    width: 100% !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-  }
-  
+
   .product-pdf-button {
     width: 100% !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
+    font-size: 14px !important;
   }
   
   .single-product-body {
