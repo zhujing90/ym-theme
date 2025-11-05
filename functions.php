@@ -243,38 +243,44 @@ function ym_product_details_callback($post) {
     echo '<p class="description">Brief description of the product</p>';
     echo '</div>';
     
-    // Content Description (Detailed)
-    // $content_desc = get_post_meta($post->ID, '_product_content_description', true);
-    // echo '<div style="margin-bottom: 20px;">';
-    // echo '<label for="product_content_description"><strong>Content Description</strong></label><br>';
-    // wp_editor($content_desc, 'product_content_description', array(
-    //     'textarea_name' => 'product_content_description',
-    //     'media_buttons' => false,
-    //     'textarea_rows' => 10
-    // ));
-    // echo '</div>';
-    
     // Gallery Images
+    $saved_gallery_ids = get_post_meta($post->ID, '_product_gallery_images', true);
     echo '<div style="margin-bottom: 20px;">';
     echo '<label><strong>Product Gallery Images</strong></label><br>';
     echo '<button type="button" class="button" id="product_gallery_upload">Upload Images</button>';
     echo '<button type="button" class="button" id="product_gallery_remove">Remove All</button>';
-    echo '<div id="product_gallery_preview" style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 10px;"></div>';
-    echo '<input type="hidden" name="product_gallery_images" id="product_gallery_images" value="' . esc_attr(get_post_meta($post->ID, '_product_gallery_images', true)) . '">';
+    echo '<div id="product_gallery_preview" style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 10px;">';
+    // 直接输出已保存的图片缩略图
+    if ($saved_gallery_ids) {
+        $image_ids = array_filter(array_map('intval', explode(',', $saved_gallery_ids)));
+        foreach ($image_ids as $img_id) {
+            $thumb = wp_get_attachment_image_src($img_id, 'thumbnail');
+            if ($thumb) {
+                echo '<img src="' . esc_url($thumb[0]) . '" style="max-width: 150px; height: auto; border: 1px solid #ddd; padding: 5px; border-radius: 4px;" data-attachment-id="' . esc_attr($img_id) . '">';
+            }
+        }
+    }
+    echo '</div>';
+    echo '<input type="hidden" name="product_gallery_images" id="product_gallery_images" value="' . esc_attr($saved_gallery_ids) . '">';
     echo '</div>';
     
     // PDF File
-    echo '<div style="margin-bottom: 20px;">';
-    echo '<label><strong>Product PDF (Downloadable)</strong></label><br>';
     $pdf_id = get_post_meta($post->ID, '_product_pdf_file', true);
     $pdf_url = $pdf_id ? wp_get_attachment_url($pdf_id) : '';
+    $pdf_filename = $pdf_id ? get_the_title($pdf_id) : '';
+    if (!$pdf_filename && $pdf_url) {
+        $pdf_filename = basename($pdf_url);
+    }
+    echo '<div style="margin-bottom: 20px;">';
+    echo '<label><strong>Product PDF (Downloadable)</strong></label><br>';
     echo '<button type="button" class="button" id="product_pdf_upload">' . ($pdf_url ? 'Change PDF' : 'Upload PDF') . '</button>';
     echo '<button type="button" class="button" id="product_pdf_remove">Remove PDF</button>';
-    if ($pdf_url) {
-        echo '<p><a href="' . esc_url($pdf_url) . '" target="_blank">' . basename($pdf_url) . '</a></p>';
-    }
     echo '<input type="hidden" name="product_pdf_file" id="product_pdf_file" value="' . esc_attr($pdf_id) . '">';
-    echo '<div id="product_pdf_preview"></div>';
+    echo '<div id="product_pdf_preview" style="margin-top: 10px;">';
+    if ($pdf_url && $pdf_filename) {
+        echo '<p><a href="' . esc_url($pdf_url) . '" target="_blank">' . esc_html($pdf_filename) . '</a></p>';
+    }
+    echo '</div>';
     echo '</div>';
     
     // 添加 JavaScript
@@ -293,22 +299,144 @@ function ym_product_details_callback($post) {
             
             galleryUploader = wp.media({
                 title: 'Select Product Images',
-                button: { text: 'Add Images' },
+                button: { 
+                    text: 'Add Images'
+                },
                 multiple: true,
-                library: { type: 'image' }
+                library: { 
+                    type: 'image'
+                }
+            });
+            
+            // 更新按钮文本的函数
+            function updateButtonText() {
+                setTimeout(function() {
+                    // 尝试多种方式查找按钮
+                    var button = galleryUploader.$el.find('.media-button-select, .media-button-primary, button.media-button-select, button.media-button-primary');
+                    if (!button.length) {
+                        // 如果找不到，尝试直接查找工具栏中的按钮
+                        button = galleryUploader.$el.find('.media-toolbar button');
+                    }
+                    if (button.length) {
+                        // 检查按钮是否有文本，如果没有或为空则设置
+                        var currentText = button.text().trim();
+                        if (!currentText || currentText === '' || currentText.length < 3) {
+                            button.text('Add Images');
+                            button.html('Add Images');
+                        } else if (currentText !== 'Add Images') {
+                            // 如果文本不是我们想要的，也更新
+                            button.text('Add Images');
+                            button.html('Add Images');
+                        }
+                    }
+                }, 50);
+            }
+            
+            // 确保按钮文本正确显示 - 监听多个事件
+            galleryUploader.on('open', function() {
+                updateButtonText();
+            });
+            
+            // 当选择改变时也更新按钮文本 - 立即更新并持续检查
+            galleryUploader.on('selection:single', function() {
+                updateButtonText();
+                // 额外检查，确保按钮文本不会消失
+                setTimeout(updateButtonText, 100);
+                setTimeout(updateButtonText, 300);
+            });
+            
+            galleryUploader.on('selection:multiple', function() {
+                updateButtonText();
+                // 额外检查，确保按钮文本不会消失
+                setTimeout(updateButtonText, 100);
+                setTimeout(updateButtonText, 300);
+            });
+            
+            galleryUploader.on('selection:unsingle', function() {
+                updateButtonText();
+            });
+            
+            galleryUploader.on('selection:unmultiple', function() {
+                updateButtonText();
+            });
+            
+            // 监听所有状态变化
+            galleryUploader.on('activate', function() {
+                updateButtonText();
+            });
+            
+            // 使用 MutationObserver 监听按钮变化 - 使用防抖优化
+            var updateTimeout;
+            var observerInterval;
+            galleryUploader.on('ready', function() {
+                var toolbar = galleryUploader.$el.find('.media-toolbar');
+                if (toolbar.length) {
+                    var observer = new MutationObserver(function() {
+                        // 防抖处理，避免频繁更新
+                        clearTimeout(updateTimeout);
+                        updateTimeout = setTimeout(function() {
+                            updateButtonText();
+                        }, 50);
+                    });
+                    observer.observe(toolbar[0], {
+                        childList: true,
+                        subtree: true,
+                        characterData: true
+                    });
+                    
+                    // 定期检查按钮文本（每500ms检查一次，直到媒体库关闭）
+                    observerInterval = setInterval(function() {
+                        updateButtonText();
+                    }, 500);
+                }
+            });
+            
+            // 媒体库关闭时清除定时器
+            galleryUploader.on('close', function() {
+                if (observerInterval) {
+                    clearInterval(observerInterval);
+                    observerInterval = null;
+                }
             });
             
             galleryUploader.on('select', function() {
                 var attachments = galleryUploader.state().get('selection').toJSON();
-                var imageIds = attachments.map(function(att) { return att.id; }).join(',');
-                var imageUrls = attachments.map(function(att) { return att.url; });
+                var newImageIds = attachments.map(function(att) { return att.id; });
                 
-                $('#product_gallery_images').val(imageIds);
+                // 获取现有的图片ID
+                var existingIds = $('#product_gallery_images').val();
+                var allIds = [];
+                if (existingIds && existingIds.trim() !== '') {
+                    allIds = existingIds.split(',').filter(function(id) { return id.trim() !== ''; });
+                }
                 
-                var previewHtml = imageUrls.map(function(url) {
-                    return '<img src="' + url + '" style="max-width: 150px; height: auto; border: 1px solid #ddd; padding: 5px;">';
-                }).join('');
-                $('#product_gallery_preview').html(previewHtml);
+                // 合并新图片（避免重复）
+                var previewHtml = '';
+                newImageIds.forEach(function(newId) {
+                    if (allIds.indexOf(String(newId)) === -1) {
+                        allIds.push(String(newId));
+                        // 找到对应的attachment对象
+                        var att = attachments.find(function(a) { return a.id == newId; });
+                        if (att && att.url) {
+                            // 优先使用缩略图
+                            var thumbUrl = (att.sizes && att.sizes.thumbnail && att.sizes.thumbnail.url) ? att.sizes.thumbnail.url : att.url;
+                            previewHtml += '<img src="' + thumbUrl + '" style="max-width: 150px; height: auto; border: 1px solid #ddd; padding: 5px; border-radius: 4px;" data-attachment-id="' + newId + '">';
+                        }
+                    }
+                });
+                
+                // 更新隐藏字段
+                $('#product_gallery_images').val(allIds.join(','));
+                
+                // 添加新图片到预览
+                if (previewHtml) {
+                    $('#product_gallery_preview').append(previewHtml);
+                }
+                
+                // 选择完成后立即更新按钮文本（防止按钮文本消失）
+                setTimeout(function() {
+                    updateButtonText();
+                }, 200);
             });
             
             galleryUploader.open();
@@ -318,19 +446,6 @@ function ym_product_details_callback($post) {
             $('#product_gallery_images').val('');
             $('#product_gallery_preview').html('');
         });
-        
-        // 加载已保存的图片
-        var savedImages = $('#product_gallery_images').val();
-        if (savedImages) {
-            var ids = savedImages.split(',');
-            var html = '';
-            ids.forEach(function(id) {
-                wp.media.attachment(id).fetch().done(function(att) {
-                    html += '<img src="' + att.get('url') + '" style="max-width: 150px; height: auto; border: 1px solid #ddd; padding: 5px;">';
-                    $('#product_gallery_preview').html(html);
-                });
-            });
-        }
         
         // PDF File
         var pdfUploader;
