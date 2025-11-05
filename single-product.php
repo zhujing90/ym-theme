@@ -164,20 +164,22 @@ $product_banner_url = get_site_url() . '/wp-content/uploads/2025/10/products-ban
                         <!-- 左侧：图廊 -->
                         <div class="product-gallery">
                             <div class="product-gallery-thumbs">
-                                <button type="button" class="thumb-nav up" aria-label="up">▲</button>
-                                <ul>
-                                    <?php foreach ( $images as $idx => $img_id ) :
-                                        $thumb = wp_get_attachment_image_src( $img_id, 'thumbnail' );
-                                        $full  = wp_get_attachment_image_src( $img_id, 'large' );
-                                    ?>
-                                        <li>
-                                            <a href="#" class="product-thumb-item<?php echo $idx === 0 ? ' active' : ''; ?>" data-full="<?php echo esc_url( $full[0] ); ?>">
-                                                <img src="<?php echo esc_url( $thumb[0] ); ?>" alt="thumb">
-                                            </a>
-                                        </li>
-                                    <?php endforeach; ?>
-                                </ul>
-                                <button type="button" class="thumb-nav down" aria-label="down">▼</button>
+                                <button type="button" class="thumb-nav up" aria-label="up" id="thumb-nav-up">▲</button>
+                                <div class="thumb-scroll-container">
+                                    <ul class="thumb-list">
+                                        <?php foreach ( $images as $idx => $img_id ) :
+                                            $thumb = wp_get_attachment_image_src( $img_id, 'thumbnail' );
+                                            $full  = wp_get_attachment_image_src( $img_id, 'large' );
+                                        ?>
+                                            <li>
+                                                <a href="#" class="product-thumb-item<?php echo $idx === 0 ? ' active' : ''; ?>" data-full="<?php echo esc_url( $full[0] ); ?>" data-index="<?php echo $idx; ?>">
+                                                    <img src="<?php echo esc_url( $thumb[0] ); ?>" alt="thumb">
+                                                </a>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                </div>
+                                <button type="button" class="thumb-nav down" aria-label="down" id="thumb-nav-down">▼</button>
                             </div>
                             <div class="product-gallery-main">
                                 <?php if ( ! empty( $images ) ) :
@@ -231,19 +233,92 @@ $product_banner_url = get_site_url() . '/wp-content/uploads/2025/10/products-ban
 <?php get_footer(); ?>
 
 <script>
-// 简单画廊切换
+// 产品画廊切换和滚动
 (function(){
   var main = document.getElementById('product-main-image');
-  if(!main) return;
+  var thumbList = document.querySelector('.thumb-list');
+  var thumbContainer = document.querySelector('.thumb-scroll-container');
+  var navUp = document.getElementById('thumb-nav-up');
+  var navDown = document.getElementById('thumb-nav-down');
+  
+  if(!main || !thumbList || !thumbContainer) return;
+  
   var links = document.querySelectorAll('.product-thumb-item');
-  links.forEach(function(a){
+  var scrollStep = 88; // 每次滚动88px（80px图片 + 8px gap）
+  var maxScroll = 0;
+  var currentIndex = 0;
+  
+  // 计算最大滚动距离
+  function updateScrollLimits() {
+    if (thumbList && thumbContainer) {
+      maxScroll = Math.max(0, thumbList.scrollHeight - thumbContainer.clientHeight);
+      updateNavButtons();
+    }
+  }
+  
+  // 更新导航按钮状态
+  function updateNavButtons() {
+    if (navUp) navUp.style.opacity = currentIndex > 0 ? '1' : '0.3';
+    if (navDown) navDown.style.opacity = currentIndex < links.length - 1 ? '1' : '0.3';
+  }
+  
+  // 切换到指定索引的图片
+  function switchToImage(index) {
+    if (index < 0 || index >= links.length) return;
+    
+    currentIndex = index;
+    var activeLink = links[index];
+    var url = activeLink.getAttribute('data-full');
+    
+    if (url && main) {
+      main.src = url;
+    }
+    
+    // 更新激活状态
+    links.forEach(function(x){ x.classList.remove('active'); });
+    activeLink.classList.add('active');
+    
+    // 滚动到当前选中的缩略图
+    var itemHeight = 88; // 80px + 8px gap
+    var scrollTo = index * itemHeight;
+    thumbContainer.scrollTop = scrollTo;
+    updateNavButtons();
+  }
+  
+  // 点击缩略图切换大图
+  links.forEach(function(a, index){
     a.addEventListener('click', function(e){
       e.preventDefault();
-      var url = this.getAttribute('data-full');
-      if(url){ main.src = url; }
-      links.forEach(function(x){ x.classList.remove('active'); });
-      this.classList.add('active');
+      switchToImage(index);
     });
+  });
+  
+  // 向上滚动并切换图片
+  if (navUp) {
+    navUp.addEventListener('click', function(e){
+      e.preventDefault();
+      if (currentIndex > 0) {
+        switchToImage(currentIndex - 1);
+      }
+    });
+  }
+  
+  // 向下滚动并切换图片
+  if (navDown) {
+    navDown.addEventListener('click', function(e){
+      e.preventDefault();
+      if (currentIndex < links.length - 1) {
+        switchToImage(currentIndex + 1);
+      }
+    });
+  }
+  
+  // 初始化
+  updateScrollLimits();
+  updateNavButtons();
+  window.addEventListener('resize', function() {
+    updateScrollLimits();
+    updateNavButtons();
   });
 })();
 </script>
