@@ -267,18 +267,30 @@ function ym_product_details_callback($post) {
     // PDF File
     $pdf_id = get_post_meta($post->ID, '_product_pdf_file', true);
     $pdf_url = $pdf_id ? wp_get_attachment_url($pdf_id) : '';
-    $pdf_filename = $pdf_id ? get_the_title($pdf_id) : '';
-    if (!$pdf_filename && $pdf_url) {
+    $pdf_filename = '';
+    if ($pdf_id) {
+        $pdf_filename = get_the_title($pdf_id);
+        // 如果标题为空，尝试从文件名获取
+        if (empty($pdf_filename)) {
+            $pdf_attachment = get_post($pdf_id);
+            if ($pdf_attachment && $pdf_attachment->post_title) {
+                $pdf_filename = $pdf_attachment->post_title;
+            } else if ($pdf_url) {
+                $pdf_filename = basename($pdf_url);
+            }
+        }
+    } else if ($pdf_url) {
         $pdf_filename = basename($pdf_url);
     }
+    
     echo '<div style="margin-bottom: 20px;">';
     echo '<label><strong>Product PDF (Downloadable)</strong></label><br>';
     echo '<button type="button" class="button" id="product_pdf_upload">' . ($pdf_url ? 'Change PDF' : 'Upload PDF') . '</button>';
-    echo '<button type="button" class="button" id="product_pdf_remove">Remove PDF</button>';
+    echo '<button type="button" class="button" id="product_pdf_remove" style="' . (!$pdf_url ? 'display:none;' : '') . '">Remove PDF</button>';
     echo '<input type="hidden" name="product_pdf_file" id="product_pdf_file" value="' . esc_attr($pdf_id) . '">';
-    echo '<div id="product_pdf_preview" style="margin-top: 10px;">';
+    echo '<div id="product_pdf_preview" style="margin-top: 10px; min-height: 30px;">';
     if ($pdf_url && $pdf_filename) {
-        echo '<p><a href="' . esc_url($pdf_url) . '" target="_blank">' . esc_html($pdf_filename) . '</a></p>';
+        echo '<p style="margin: 5px 0;"><strong>Current PDF:</strong> <a href="' . esc_url($pdf_url) . '" target="_blank" style="text-decoration: underline;">' . esc_html($pdf_filename) . '</a></p>';
     }
     echo '</div>';
     echo '</div>';
@@ -458,25 +470,59 @@ function ym_product_details_callback($post) {
             }
             
             pdfUploader = wp.media({
-                title: 'Select PDF File',
+                title: 'Select PDF File (Only one file allowed)',
                 button: { text: 'Use PDF' },
-                multiple: false,
-                library: { type: 'application/pdf' }
+                multiple: false, // 限制只能选择一个
+                library: { 
+                    type: 'application/pdf' 
+                }
+            });
+            
+            // 确保只能选择一个文件
+            pdfUploader.on('open', function() {
+                var selection = pdfUploader.state().get('selection');
+                // 限制选择数量为1
+                selection.on('add', function() {
+                    if (selection.length > 1) {
+                        selection.remove(selection.models[0]);
+                    }
+                });
             });
             
             pdfUploader.on('select', function() {
                 var attachment = pdfUploader.state().get('selection').first().toJSON();
-                $('#product_pdf_file').val(attachment.id);
-                $('#product_pdf_preview').html('<p><a href="' + attachment.url + '" target="_blank">' + attachment.filename + '</a></p>');
+                var pdfId = attachment.id;
+                var pdfUrl = attachment.url;
+                var pdfFilename = attachment.filename || attachment.title || basename(pdfUrl);
+                
+                // 更新隐藏字段
+                $('#product_pdf_file').val(pdfId);
+                
+                // 更新预览 - 显示文件名
+                var previewHtml = '<p style="margin: 5px 0;"><strong>Current PDF:</strong> <a href="' + pdfUrl + '" target="_blank" style="text-decoration: underline;">' + pdfFilename + '</a></p>';
+                $('#product_pdf_preview').html(previewHtml);
+                
+                // 更新按钮文本
+                $('#product_pdf_upload').text('Change PDF');
+                $('#product_pdf_remove').show();
             });
             
             pdfUploader.open();
         });
         
         $('#product_pdf_remove').on('click', function() {
-            $('#product_pdf_file').val('');
-            $('#product_pdf_preview').html('');
+            if (confirm('Are you sure you want to remove this PDF?')) {
+                $('#product_pdf_file').val('');
+                $('#product_pdf_preview').html('');
+                $('#product_pdf_upload').text('Upload PDF');
+                $(this).hide();
+            }
         });
+        
+        // 辅助函数：从URL获取文件名
+        function basename(path) {
+            return path.split('/').pop().split('?')[0];
+        }
     });
     </script>
     <?php

@@ -1058,7 +1058,26 @@ body {
 .single-product-body { margin-top: 20px; }
 .single-product-content { font-size: 16px; line-height: 28px; color: #333; }
 .product-pdf { margin-top: 16px; }
-.product-pdf-button { background: #3083D6; color: #fff; padding: 10px 16px; text-decoration: none; border-radius: 4px; display: inline-block; }
+.product-pdf-button { 
+    display: inline-block; 
+    width: 250px; 
+    height: 42px; 
+    background: #4CAF50; 
+    font-weight: 500; 
+    font-size: 16px; 
+    color: #FFFFFF; 
+    line-height: 24px; 
+    text-align: center; 
+    text-decoration: none; 
+    border-radius: 4px; 
+    padding: 9px 0; 
+    box-sizing: border-box;
+    transition: background-color 0.3s ease;
+}
+.product-pdf-button:hover {
+    background: #45a049;
+    color: #FFFFFF;
+}
 
 @media (max-width: 768px) {
   .product-gallery {

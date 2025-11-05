@@ -13,6 +13,7 @@ get_header();
 
 // Banner image url
 $product_banner_url = get_site_url() . '/wp-content/uploads/2025/10/products-banner-scaled.png';
+$download_icon_url = get_site_url() . '/wp-content/uploads/2025/10/b01.png';
 ?>
 
 <div class="product-hero-wrapper">
@@ -212,7 +213,19 @@ $product_banner_url = get_site_url() . '/wp-content/uploads/2025/10/products-ban
                             $pdf_id = get_post_meta( get_the_ID(), '_product_pdf_file', true );
                             if ( $pdf_id ) {
                                 $pdf_url = wp_get_attachment_url( $pdf_id );
-                                echo '<p class="product-pdf"><a class="product-pdf-button" href="' . esc_url( $pdf_url ) . '" target="_blank" rel="noopener">Download PDF</a></p>';
+                                // 获取PDF文件名
+                                $pdf_filename = get_the_title( $pdf_id );
+                                if ( empty( $pdf_filename ) ) {
+                                    $pdf_attachment = get_post( $pdf_id );
+                                    if ( $pdf_attachment && $pdf_attachment->post_title ) {
+                                        $pdf_filename = $pdf_attachment->post_title;
+                                    } else {
+                                        $pdf_filename = basename( $pdf_url );
+                                    }
+                                }
+                                // 移除文件扩展名（如果存在）
+                                $pdf_name = preg_replace( '/\.pdf$/i', '', $pdf_filename );
+                                echo '<p class="product-pdf"><a class="product-pdf-button" href="' . esc_url( $pdf_url ) . '" target="_blank" rel="noopener"><img src="' . esc_url( $download_icon_url ) . '" alt="Download" style="width: 20px; height: 20px; margin-right: 5px;">' . esc_html( $pdf_name ) . ' PDF</a></p>';
                             }
                             ?>
                         </div>
