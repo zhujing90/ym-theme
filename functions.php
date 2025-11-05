@@ -717,3 +717,222 @@ add_filter( 'document_title_parts', function( $title ) {
 
     return $title;
 });
+
+/**
+ * 为自定义产品类型添加“Best Seller”勾选框
+ */
+function ym_add_best_seller_meta_box() {
+  add_meta_box(
+    'ym_best_seller_box',
+    'Best Seller',
+    'ym_best_seller_box_callback',
+    'product',
+    'side',
+    'high'
+  );
+}
+add_action('add_meta_boxes', 'ym_add_best_seller_meta_box');
+
+function ym_best_seller_box_callback($post) {
+  $is_best_seller = get_post_meta($post->ID, '_is_best_seller', true);
+  ?>
+  <label>
+    <input type="checkbox" name="ym_is_best_seller" value="1" <?php checked($is_best_seller, '1'); ?>>
+    Mark this product as Best Seller
+  </label>
+  <?php
+}
+
+// 保存勾选状态
+function ym_save_best_seller_meta($post_id) {
+  if (array_key_exists('ym_is_best_seller', $_POST)) {
+    update_post_meta($post_id, '_is_best_seller', '1');
+  } else {
+    delete_post_meta($post_id, '_is_best_seller');
+  }
+}
+add_action('save_post_product', 'ym_save_best_seller_meta');
+
+/**
+ * Shortcode: [best_sales_products limit="6"]
+ */
+function ym_best_sales_products_shortcode($atts) {
+  $atts = shortcode_atts(array(
+    'limit' => 6,
+  ), $atts, 'best_sales_products');
+
+  $args = array(
+    'post_type'      => 'product',
+    'posts_per_page' => intval($atts['limit']),
+    'meta_key'       => '_is_best_seller',
+    'meta_value'     => '1',
+  );
+
+  $query = new WP_Query($args);
+
+  ob_start();
+
+  if ($query->have_posts()) :
+    $post_count = $query->post_count;
+    $carousel_id = 'best-sales-carousel-' . uniqid();
+    ?>
+    <div class="best-sales-carousel-wrapper">
+      <div class="best-sales-carousel" id="<?php echo esc_attr($carousel_id); ?>">
+        <div class="best-sales-carousel-container">
+          <?php while ($query->have_posts()) : $query->the_post(); 
+            // 获取产品分类
+            $terms = get_the_terms( get_the_ID(), 'product_category' );
+            $category_name = '';
+            if ( $terms && ! is_wp_error( $terms ) ) {
+              $category_name = $terms[0]->name;
+            }
+          ?>
+            <article id="post-<?php the_ID(); ?>" <?php post_class('product-card best-sales-item'); ?>>
+              <a href="<?php the_permalink(); ?>" class="product-card-link">
+                <div class="product-thumb">
+                  <?php if ( has_post_thumbnail() ) {
+                    the_post_thumbnail( 'medium' );
+                  } else {
+                    echo '<div class="product-placeholder"></div>';
+                  } ?>
+                </div>
+                
+                <!-- Hover 覆盖层 -->
+                <div class="product-hover-overlay">
+                  <div class="product-hover-content">
+                    <svg class="product-search-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="11" cy="11" r="8" stroke="white" stroke-width="2" fill="none"/>
+                      <path d="m21 21-4.35-4.35" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <?php if ( $category_name ) : ?>
+                      <div class="product-category-name"><?php echo esc_html( $category_name ); ?></div>
+                    <?php endif; ?>
+                  </div>
+                </div>
+                
+                <div class="product-title-wrapper">
+                  <h3 class="product-title">
+                    <?php the_title(); ?>
+                  </h3>
+                  <div class="product-view-more">
+                    <span>View More</span>
+                    <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M5 12h14M12 5l7 7-7 7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+                </div>
+              </a>
+            </article>
+          <?php endwhile; ?>
+        </div>
+      </div>
+      
+      <?php if ($post_count > 1) : // 如果超过1个item，显示按钮 ?>
+        <button class="best-sales-nav best-sales-nav-prev" aria-label="Previous">&lt;</button>
+        <button class="best-sales-nav best-sales-nav-next" aria-label="Next">&gt;</button>
+      <?php endif; ?>
+    </div>
+    
+    <script>
+    (function() {
+      var carousel = document.getElementById('<?php echo esc_js($carousel_id); ?>');
+      if (!carousel) return;
+      
+      var container = carousel.querySelector('.best-sales-carousel-container');
+      var wrapper = carousel.closest('.best-sales-carousel-wrapper');
+      var prevBtn = wrapper ? wrapper.querySelector('.best-sales-nav-prev') : null;
+      var nextBtn = wrapper ? wrapper.querySelector('.best-sales-nav-next') : null;
+      var items = container ? container.querySelectorAll('.best-sales-item') : [];
+      var currentIndex = 0;
+      var itemsPerView = 4;
+      var maxIndex = 0;
+      var resizeTimeout;
+      
+      function getItemsPerView() {
+        return window.innerWidth <= 768 ? 1 : 4;
+      }
+      
+      function updateCarousel() {
+        if (!container || items.length === 0) return;
+        
+        itemsPerView = getItemsPerView();
+        maxIndex = Math.max(0, items.length - itemsPerView);
+        
+        if (currentIndex > maxIndex) {
+          currentIndex = maxIndex;
+        }
+        
+        updateTransform();
+        updateButtons();
+      }
+      
+      function updateTransform() {
+        if (!container || items.length === 0) return;
+        
+        var itemWidth = items[0].offsetWidth;
+        var gap = 24; // 与CSS中的gap一致
+        var translateX = -(currentIndex * (itemWidth + gap));
+        container.style.transform = 'translateX(' + translateX + 'px)';
+        container.style.transition = 'transform 0.3s ease';
+      }
+      
+      function updateButtons() {
+        if (prevBtn) {
+          prevBtn.style.opacity = currentIndex > 0 ? '1' : '0.3';
+          prevBtn.style.pointerEvents = currentIndex > 0 ? 'auto' : 'none';
+        }
+        if (nextBtn) {
+          nextBtn.style.opacity = currentIndex < maxIndex ? '1' : '0.3';
+          nextBtn.style.pointerEvents = currentIndex < maxIndex ? 'auto' : 'none';
+        }
+      }
+      
+      if (prevBtn) {
+        prevBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          if (currentIndex > 0) {
+            currentIndex--;
+            updateTransform();
+            updateButtons();
+          }
+        });
+      }
+      
+      if (nextBtn) {
+        nextBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          if (currentIndex < maxIndex) {
+            currentIndex++;
+            updateTransform();
+            updateButtons();
+          }
+        });
+      }
+      
+      // 窗口大小改变时重新计算
+      window.addEventListener('resize', function() {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(function() {
+          updateCarousel();
+        }, 100);
+      });
+      
+      // 等待DOM加载完成后再初始化
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+          setTimeout(updateCarousel, 100);
+        });
+      } else {
+        setTimeout(updateCarousel, 100);
+      }
+    })();
+    </script>
+    <?php
+  else :
+    echo '<p>No best seller products found.</p>';
+  endif;
+
+  wp_reset_postdata();
+  return ob_get_clean();
+}
+add_shortcode('best_sales_products', 'ym_best_sales_products_shortcode');
