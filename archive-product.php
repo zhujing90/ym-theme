@@ -33,7 +33,7 @@ $product_banner_url = get_site_url() . '/wp-content/uploads/2025/10/products-ban
         // echo '<span>' . esc_html(get_the_title()) . '</span>';
         echo '</div>';
         ?>
-        <div class="products-archive" style="display: grid; grid-template-columns: 260px 1fr; gap: 30px; align-items: start;">
+        <div class="products-archive">
 
             <!-- Left: Product Categories -->
             <aside class="product-categories">
@@ -124,7 +124,7 @@ $product_banner_url = get_site_url() . '/wp-content/uploads/2025/10/products-ban
             <!-- Right: Product List -->
             <section>
                 <?php if ( have_posts() ) : ?>
-                    <div class="product-grid" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px;">
+                    <div class="product-grid">
                         <?php while ( have_posts() ) : the_post(); 
                             // 获取产品分类
                             $terms = get_the_terms( get_the_ID(), 'product_category' );

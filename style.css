@@ -468,6 +468,10 @@ body {
 }
 
 /* ====== Footer ====== */
+.site-footer {
+  background-color: #181a1b;
+}
+
 /* 针对 footer widget 1 */
 
 #custom_html-1 {
@@ -928,6 +932,21 @@ body {
 }
 
 /* ====== Single Product Detail ====== */
+/* Product Archive Layout - Desktop */
+.products-archive {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 30px;
+  align-items: start;
+}
+
+/* Product Grid - Desktop */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
 .single-product .products-archive {
   display: grid;
   grid-template-columns: 260px 1fr;
@@ -1080,6 +1099,35 @@ body {
 }
 
 @media (max-width: 768px) {
+  /* Product Archive - 移动端布局 */
+  .products-archive {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+  
+  /* 移动端隐藏产品分类侧边栏 */
+  .product-categories {
+    display: none !important;
+  }
+  
+  /* 移动端产品网格显示为一列 */
+  .product-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  
+  /* 移动端产品卡片优化 */
+  .product-card {
+    height: auto !important;
+    min-height: 300px;
+  }
+  
+  .product-title-wrapper {
+    min-height: 64px !important;
+  }
+  
+  /* Product Detail - 移动端布局 */
   .product-gallery {
     grid-template-columns: 1fr;
   }

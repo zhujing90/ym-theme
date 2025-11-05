@@ -34,7 +34,7 @@ $download_icon_url = get_site_url() . '/wp-content/uploads/2025/10/b01.png';
         // echo '<span>' . esc_html(get_the_title()) . '</span>';
         echo '</div>';
         ?>
-        <div class="products-archive" style="display: grid; grid-template-columns: 260px 1fr; gap: 30px; align-items: start;">
+        <div class="products-archive">
 
             <!-- Left: Product Categories -->
             <aside class="product-categories">
