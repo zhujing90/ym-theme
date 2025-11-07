@@ -128,6 +128,11 @@ function ym_add_product_category_image_field($taxonomy) {
         <button type="button" class="button upload_image_button">Upload Image</button>
         <button type="button" class="button remove_image_button">Remove Image</button>
     </div>
+    <div class="form-field term-group">
+        <label for="product_category_order">Sort Order</label>
+        <input type="number" id="product_category_order" name="product_category_order" value="0" min="0" step="1" style="width: 100px;">
+        <p class="description">Lower numbers appear first. Default is 0.</p>
+    </div>
     <?php
 }
 add_action('product_category_add_form_fields', 'ym_add_product_category_image_field', 10, 2);
@@ -136,6 +141,8 @@ add_action('product_category_add_form_fields', 'ym_add_product_category_image_fi
 function ym_edit_product_category_image_field($term, $taxonomy) {
     $image_id = get_term_meta($term->term_id, 'product_category_image', true);
     $image_url = $image_id ? wp_get_attachment_url($image_id) : '';
+    $order = get_term_meta($term->term_id, 'product_category_order', true);
+    $order = $order !== '' ? intval($order) : 0;
     ?>
     <tr class="form-field term-group-wrap">
         <th scope="row"><label for="product_category_image">Category Image</label></th>
@@ -150,21 +157,173 @@ function ym_edit_product_category_image_field($term, $taxonomy) {
             <button type="button" class="button remove_image_button">Remove Image</button>
         </td>
     </tr>
+    <tr class="form-field term-group-wrap">
+        <th scope="row"><label for="product_category_order">Sort Order</label>
+        <td>
+            <input type="number" id="product_category_order" name="product_category_order" value="<?php echo esc_attr($order); ?>" min="0" step="1" style="width: 100px;">
+            <p class="description">Lower numbers appear first. Default is 0.</p>
+        </td>
+    </tr>
     <?php
 }
 add_action('product_category_edit_form_fields', 'ym_edit_product_category_image_field', 10, 2);
 
-// 保存图片字段
+// 保存图片字段和排序字段
 function ym_save_product_category_image($term_id, $tt_id) {
     if (isset($_POST['product_category_image']) && '' !== $_POST['product_category_image']) {
         update_term_meta($term_id, 'product_category_image', sanitize_text_field($_POST['product_category_image']));
     } else {
         delete_term_meta($term_id, 'product_category_image');
     }
+    
+    // 保存排序字段
+    if (isset($_POST['product_category_order'])) {
+        $order = intval($_POST['product_category_order']);
+        update_term_meta($term_id, 'product_category_order', $order);
+    } else {
+        update_term_meta($term_id, 'product_category_order', 0);
+    }
 }
 add_action('created_product_category', 'ym_save_product_category_image', 10, 2);
 add_action('edited_product_category', 'ym_save_product_category_image', 10, 2);
 
+// 在分类列表页面添加排序列
+function ym_add_product_category_order_column($columns) {
+    // 直接添加排序列，放在名称列之后
+    $new_columns = array();
+    foreach ($columns as $key => $value) {
+        $new_columns[$key] = $value;
+        // 在名称列之后添加排序列
+        if ($key === 'name') {
+            $new_columns['product_category_order'] = 'Sort Order';
+        }
+    }
+    // 如果没有名称列，直接添加到最后
+    if (!isset($columns['name'])) {
+        $new_columns['product_category_order'] = 'Sort Order';
+    }
+    return $new_columns;
+}
+add_filter('manage_edit-product_category_columns', 'ym_add_product_category_order_column', 20);
+
+// 显示排序列的值 - 使用 filter（WordPress 核心使用 apply_filters）
+function ym_show_product_category_order_column($content, $column_name, $term_id) {
+    // 确保是我们要处理的列
+    if ($column_name !== 'product_category_order') {
+        return $content;
+    }
+    
+    // 确保 term_id 有效
+    if (empty($term_id) || !is_numeric($term_id)) {
+        return $content;
+    }
+    
+    // 获取排序值
+    $term_id = intval($term_id);
+    $order = get_term_meta($term_id, 'product_category_order', true);
+    
+    // 处理排序值 - 如果为空或无效，默认为 0
+    if ($order === '' || $order === false || $order === null) {
+        $order = 0;
+    } else {
+        $order = intval($order);
+    }
+    
+    // 返回格式化的内容
+    return '<span style="font-weight: bold; color: #2271b1;">' . esc_html($order) . '</span>';
+}
+// 使用高优先级确保在其他插件之后执行，并且确保返回的内容被使用
+add_filter('manage_product_category_custom_column', 'ym_show_product_category_order_column', 999, 3);
+
+// 让排序列可排序
+function ym_make_product_category_order_column_sortable($sortable) {
+    $sortable['product_category_order'] = 'product_category_order';
+    return $sortable;
+}
+add_filter('manage_edit-product_category_sortable_columns', 'ym_make_product_category_order_column_sortable');
+
+// 处理后台列表页面的排序（仅在点击排序列时）
+function ym_sort_product_categories_in_admin($clauses, $taxonomies, $args) {
+    global $pagenow, $wpdb;
+    
+    // 只在后台分类列表页面处理
+    if ($pagenow !== 'edit-tags.php' || !isset($_GET['taxonomy']) || $_GET['taxonomy'] !== 'product_category') {
+        return $clauses;
+    }
+    
+    // 只在明确点击排序列时修改查询，不影响默认显示
+    if (isset($_GET['orderby']) && $_GET['orderby'] === 'product_category_order') {
+        // 确保 join 存在且不重复
+        if (strpos($clauses['join'], 'termmeta') === false) {
+            $clauses['join'] .= " LEFT JOIN {$wpdb->termmeta} AS tm ON t.term_id = tm.term_id AND tm.meta_key = 'product_category_order'";
+        }
+        $order = isset($_GET['order']) && $_GET['order'] === 'desc' ? 'DESC' : 'ASC';
+        $clauses['orderby'] = "CAST(COALESCE(tm.meta_value, '9999') AS UNSIGNED) {$order}, t.name ASC";
+    }
+    
+    return $clauses;
+}
+add_filter('terms_clauses', 'ym_sort_product_categories_in_admin', 10, 3);
+
+// 按排序值排序分类（仅在前端和特定查询时）
+function ym_sort_product_categories_by_order($terms, $taxonomies, $args) {
+    global $pagenow;
+    
+    // 在后台列表页面不处理，让 WordPress 默认处理
+    if ($pagenow === 'edit-tags.php' && isset($_GET['taxonomy']) && $_GET['taxonomy'] === 'product_category') {
+        return $terms;
+    }
+    
+    // 检查是否是 product_category
+    if (empty($taxonomies)) {
+        return $terms;
+    }
+    
+    // 如果 taxonomies 是字符串，转换为数组
+    if (is_string($taxonomies)) {
+        $taxonomies = array($taxonomies);
+    }
+    
+    // 检查是否包含 product_category
+    if (!is_array($taxonomies) || !in_array('product_category', $taxonomies)) {
+        return $terms;
+    }
+    
+    // 如果 terms 为空或不是数组，直接返回
+    if (empty($terms) || !is_array($terms)) {
+        return $terms;
+    }
+    
+    // 如果已经指定了其他 orderby（如 ID, slug, count 等），则不覆盖
+    if (isset($args['orderby']) && !in_array($args['orderby'], array('name', 'term_order', ''))) {
+        return $terms;
+    }
+    
+    // 为每个分类添加排序值
+    foreach ($terms as $term) {
+        if (is_object($term) && isset($term->term_id)) {
+            $order = get_term_meta($term->term_id, 'product_category_order', true);
+            $term->term_order = ($order !== '' && $order !== false && $order !== null) ? intval($order) : 9999; // 没有排序值的排在最后
+        }
+    }
+    
+    // 按排序值排序，然后按名称排序
+    usort($terms, function($a, $b) {
+        if (!is_object($a) || !is_object($b)) {
+            return 0;
+        }
+        $order_a = isset($a->term_order) ? $a->term_order : 9999;
+        $order_b = isset($b->term_order) ? $b->term_order : 9999;
+        
+        if ($order_a == $order_b) {
+            return strcmp($a->name, $b->name);
+        }
+        return ($order_a < $order_b) ? -1 : 1;
+    });
+    
+    return $terms;
+}
+add_filter('get_terms', 'ym_sort_product_categories_by_order', 10, 3);
 
 // 在产品分类页面添加图片上传脚本
 function ym_product_category_image_script() {
@@ -936,3 +1095,85 @@ function ym_best_sales_products_shortcode($atts) {
   return ob_get_clean();
 }
 add_shortcode('best_sales_products', 'ym_best_sales_products_shortcode');
+
+/**
+ * Shortcode: [product_category_grid]
+ * 显示产品分类网格，按排序值排序，最多显示9个
+ */
+function ym_product_category_grid_shortcode($atts) {
+    $atts = shortcode_atts(array(
+        'limit' => 9,
+    ), $atts, 'product_category_grid');
+    
+    // 获取所有一级产品分类（parent = 0，不限制数量，先排序再限制）
+    $terms = get_terms(array(
+        'taxonomy' => 'product_category',
+        'hide_empty' => false,
+        'parent' => 0, // 只获取一级分类
+    ));
+    
+    if (empty($terms) || is_wp_error($terms)) {
+        return '';
+    }
+    
+    // 按排序值排序
+    foreach ($terms as $term) {
+        $order = get_term_meta($term->term_id, 'product_category_order', true);
+        $term->term_order = ($order !== '' && $order !== false && $order !== null) ? intval($order) : 9999;
+    }
+    
+    usort($terms, function($a, $b) {
+        if ($a->term_order == $b->term_order) {
+            return strcmp($a->name, $b->name);
+        }
+        return ($a->term_order < $b->term_order) ? -1 : 1;
+    });
+    
+    // 限制数量（排序后）
+    $terms = array_slice($terms, 0, intval($atts['limit']));
+    
+    // 获取 products 页面链接
+    $products_url = get_post_type_archive_link('product');
+    if (!$products_url) {
+        $products_url = home_url('/products/');
+    }
+    
+    ob_start();
+    ?>
+    <div class="product-category-grid">
+        <?php foreach ($terms as $term) : 
+            // 获取分类图片
+            $image_id = get_term_meta($term->term_id, 'product_category_image', true);
+            $image_url = $image_id ? wp_get_attachment_url($image_id) : '';
+            $term_link = get_term_link($term);
+            
+            if (is_wp_error($term_link)) {
+                $term_link = '#';
+            }
+        ?>
+            <div class="product-card">
+                <div class="product-content">
+                    <h3 class="product-title"><?php echo esc_html($term->name); ?></h3>
+                    <a href="<?php echo esc_url($term_link); ?>" class="view-more">View More</a>
+                </div>
+                <div class="product-image">
+                    <?php if ($image_url) : ?>
+                        <img src="<?php echo esc_url($image_url); ?>" alt="<?php echo esc_attr($term->name); ?>">
+                    <?php else : ?>
+                        <div style="width: 100%; height: 100%; background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #999;">
+                            <span><?php echo esc_html($term->name); ?></span>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+    
+    <div class="product-category-grid-view-more">
+        <a href="<?php echo esc_url($products_url); ?>" class="view-more-button">View More</a>
+    </div>
+    <?php
+    
+    return ob_get_clean();
+}
+add_shortcode('product_category_grid', 'ym_product_category_grid_shortcode');
