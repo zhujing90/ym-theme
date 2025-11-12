@@ -423,7 +423,7 @@ body {
 
 /* 修正正文容器 */
 .news-single-content, .products-archive-content {
-  max-width: 1180px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 20px;
 }
@@ -961,11 +961,19 @@ body {
 }
 
 /* ====== Best Sales Products Carousel ====== */
-.best-sales-carousel-wrapper {
+.best-sales-carousel-outer-wrapper {
   position: relative;
   width: 100%;
+  box-sizing: border-box;
+}
+
+.best-sales-carousel-wrapper {
+  position: relative;
+  max-width: 1440px;
+  width: 100%;
+  margin: 0 auto;
   overflow: visible; /* 允许箭头显示在外部 */
-  padding: 0 60px; /* 为左右箭头留出空间 */
+  padding: 0;
   box-sizing: border-box;
 }
 
@@ -1019,11 +1027,11 @@ body {
 }
 
 .best-sales-nav-prev {
-  left: 0; /* 放在wrapper左边缘 */
+  left: -60px; /* 放在1440px容器外部左侧 */
 }
 
 .best-sales-nav-next {
-  right: 0; /* 放在wrapper右边缘 */
+  right: -60px; /* 放在1440px容器外部右侧 */
 }
 
 .best-sales-nav svg {
@@ -1040,8 +1048,12 @@ body {
 
 /* 移动端样式 */
 @media (max-width: 768px) {
-  .best-sales-carousel-wrapper {
+  .best-sales-carousel-outer-wrapper {
     padding: 0 50px !important; /* 移动端减少padding */
+  }
+  
+  .best-sales-carousel-wrapper {
+    padding: 0;
   }
   
   .best-sales-item {
@@ -1066,11 +1078,26 @@ body {
   }
   
   .best-sales-nav-prev {
-    left: 0;
+    left: 0; /* 移动端按钮在容器内 */
   }
   
   .best-sales-nav-next {
-    right: 0;
+    right: 0; /* 移动端按钮在容器内 */
+  }
+}
+
+/* 确保在小于1560px的屏幕上，按钮不会超出视口 */
+@media (max-width: 1560px) {
+  .best-sales-carousel-outer-wrapper {
+    padding: 0 10px; /* 小屏幕上减少padding，按钮在容器内 */
+  }
+  
+  .best-sales-nav-prev {
+    left: -40px; /* 小屏幕上按钮在容器内 */
+  }
+  
+  .best-sales-nav-next {
+    right: -40px; /* 小屏幕上按钮在容器内 */
   }
 }
 

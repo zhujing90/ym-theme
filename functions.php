@@ -935,61 +935,63 @@ function ym_best_sales_products_shortcode($atts) {
     $post_count = $query->post_count;
     $carousel_id = 'best-sales-carousel-' . uniqid();
     ?>
-    <div class="best-sales-carousel-wrapper">
-      <div class="best-sales-carousel" id="<?php echo esc_attr($carousel_id); ?>">
-        <div class="best-sales-carousel-container">
-          <?php while ($query->have_posts()) : $query->the_post(); 
-            // 获取产品分类
-            $terms = get_the_terms( get_the_ID(), 'product_category' );
-            $category_name = '';
-            if ( $terms && ! is_wp_error( $terms ) ) {
-              $category_name = $terms[0]->name;
-            }
-          ?>
-            <article id="post-<?php the_ID(); ?>" <?php post_class('product-card best-sales-item'); ?>>
-              <a href="<?php the_permalink(); ?>" class="product-card-link">
-                <div class="product-thumb">
-                  <?php if ( has_post_thumbnail() ) {
-                    the_post_thumbnail( 'medium' );
-                  } else {
-                    echo '<div class="product-placeholder"></div>';
-                  } ?>
-                </div>
-                
-                <!-- Hover 覆盖层 -->
-                <div class="product-hover-overlay">
-                  <div class="product-hover-content">
-                    <svg class="product-search-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <circle cx="11" cy="11" r="8" stroke="white" stroke-width="2" fill="none"/>
-                      <path d="m21 21-4.35-4.35" stroke="white" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                    <?php if ( $category_name ) : ?>
-                      <div class="product-category-name"><?php echo esc_html( $category_name ); ?></div>
-                    <?php endif; ?>
+    <div class="best-sales-carousel-outer-wrapper">
+      <div class="best-sales-carousel-wrapper">
+        <div class="best-sales-carousel" id="<?php echo esc_attr($carousel_id); ?>">
+          <div class="best-sales-carousel-container">
+            <?php while ($query->have_posts()) : $query->the_post(); 
+              // 获取产品分类
+              $terms = get_the_terms( get_the_ID(), 'product_category' );
+              $category_name = '';
+              if ( $terms && ! is_wp_error( $terms ) ) {
+                $category_name = $terms[0]->name;
+              }
+            ?>
+              <article id="post-<?php the_ID(); ?>" <?php post_class('product-card best-sales-item'); ?>>
+                <a href="<?php the_permalink(); ?>" class="product-card-link">
+                  <div class="product-thumb">
+                    <?php if ( has_post_thumbnail() ) {
+                      the_post_thumbnail( 'medium' );
+                    } else {
+                      echo '<div class="product-placeholder"></div>';
+                    } ?>
                   </div>
-                </div>
-                
-                <div class="product-title-wrapper">
-                  <h3 class="product-title">
-                    <?php the_title(); ?>
-                  </h3>
-                  <div class="product-view-more">
-                    <span>View More</span>
-                    <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M5 12h14M12 5l7 7-7 7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
+                  
+                  <!-- Hover 覆盖层 -->
+                  <div class="product-hover-overlay">
+                    <div class="product-hover-content">
+                      <svg class="product-search-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="11" cy="11" r="8" stroke="white" stroke-width="2" fill="none"/>
+                        <path d="m21 21-4.35-4.35" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                      </svg>
+                      <?php if ( $category_name ) : ?>
+                        <div class="product-category-name"><?php echo esc_html( $category_name ); ?></div>
+                      <?php endif; ?>
+                    </div>
                   </div>
-                </div>
-              </a>
-            </article>
-          <?php endwhile; ?>
+                  
+                  <div class="product-title-wrapper">
+                    <h3 class="product-title">
+                      <?php the_title(); ?>
+                    </h3>
+                    <div class="product-view-more">
+                      <span>View More</span>
+                      <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 12h14M12 5l7 7-7 7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </div>
+                  </div>
+                </a>
+              </article>
+            <?php endwhile; ?>
+          </div>
         </div>
+        
+        <?php if ($post_count > 1) : // 如果超过1个item，显示按钮 ?>
+          <button class="best-sales-nav best-sales-nav-prev" aria-label="Previous">&lt;</button>
+          <button class="best-sales-nav best-sales-nav-next" aria-label="Next">&gt;</button>
+        <?php endif; ?>
       </div>
-      
-      <?php if ($post_count > 1) : // 如果超过1个item，显示按钮 ?>
-        <button class="best-sales-nav best-sales-nav-prev" aria-label="Previous">&lt;</button>
-        <button class="best-sales-nav best-sales-nav-next" aria-label="Next">&gt;</button>
-      <?php endif; ?>
     </div>
     
     <script>
