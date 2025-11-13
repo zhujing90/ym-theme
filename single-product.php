@@ -17,10 +17,7 @@ $download_icon_url = get_site_url() . '/wp-content/uploads/2025/10/b01.png';
 ?>
 
 <div class="product-hero-wrapper">
-    <div class="product-hero" style="background-image: url('<?php echo esc_url( $product_banner_url ); ?>'); background-size: cover; background-position: center center; background-repeat: no-repeat; height: 160px; display: block; margin: 0; padding: 0;"></div>
-    <div class="product-hero-title" style="position: relative;">
-        <!-- reserved for potential overlay text -->
-    </div>
+    <div class="product-hero" style="background-image: url('<?php echo esc_url( $product_banner_url ); ?>'); background-size: cover; background-position: center center; background-repeat: no-repeat; height: 250px; display: block; margin: 0; padding: 0;"></div>
 </div>
 
 <div class="container">
@@ -28,7 +25,7 @@ $download_icon_url = get_site_url() . '/wp-content/uploads/2025/10/b01.png';
         <?php
         // Breadcrumb - 支持多种breadcrumb插件
         // 自定义简单的breadcrumb
-        echo '<div class="breadcrumb-wrapper" style="padding-bottom: 20px;">';
+        echo '<div class="breadcrumb-wrapper" style="padding: 0 20px;">';
         echo '<a href="' . esc_url(home_url('/')) . '">Home</a> > ';
         echo '<a href="' . esc_url(get_post_type_archive_link('products')) . '">Products</a> ';
         // echo '<span>' . esc_html(get_the_title()) . '</span>';

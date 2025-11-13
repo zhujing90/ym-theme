@@ -13,7 +13,7 @@ get_header(); ?>
 $banner_url = get_site_url() . '/wp-content/uploads/2025/10/bg-news-single-scaled.png';
 ?>
 <div class="news-single-hero-wrapper">
-    <div class="news-single-hero" style="background-image: url('<?php echo esc_url($banner_url); ?>'); background-size: cover; background-position: center center; background-repeat: no-repeat; height: 160px; display: block; margin: 0; padding: 0;">
+    <div class="news-single-hero" style="background-image: url('<?php echo esc_url($banner_url); ?>'); background-size: cover; background-position: center center; background-repeat: no-repeat; height: 250px; display: block; margin: 0; padding: 0;">
     </div>
 </div>
 
@@ -22,7 +22,7 @@ $banner_url = get_site_url() . '/wp-content/uploads/2025/10/bg-news-single-scale
         <?php
         // Breadcrumb - 支持多种breadcrumb插件
         // 自定义简单的breadcrumb
-        echo '<div class="breadcrumb-wrapper" style="padding-bottom: 20px;">';
+        echo '<div class="breadcrumb-wrapper" style="padding: 0 20px;">';
         echo '<a href="' . esc_url(home_url('/')) . '">Home</a> > ';
         echo '<a href="' . esc_url(get_post_type_archive_link('news')) . '">News</a> ';
         // echo '<span>' . esc_html(get_the_title()) . '</span>';

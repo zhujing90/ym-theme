@@ -418,14 +418,13 @@ body {
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
-  height: 300px; /* 你可以改成想要的高度 */
+  height: 250px; /* 你可以改成想要的高度 */
 }
 
 /* 修正正文容器 */
 .news-single-content, .products-archive-content {
   max-width: 1440px;
   margin: 0 auto;
-  padding: 20px;
 }
 
 .news-center-image {
@@ -583,6 +582,7 @@ body {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
+  padding: 0 20px;
 }
 
 /* 每个产品卡片 */
@@ -630,8 +630,8 @@ body {
 
 /* 右侧图片 */
 .product-image {
-  width: 145px;
-  height: 218px;
+  width: 220px;
+  height: 240px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1086,10 +1086,10 @@ body {
   }
 }
 
-/* 确保在小于1560px的屏幕上，按钮不会超出视口 */
-@media (max-width: 1560px) {
+/* 确保在小于14400px的屏幕上，按钮不会超出视口 */
+@media (max-width: 1440px) {
   .best-sales-carousel-outer-wrapper {
-    padding: 0 10px; /* 小屏幕上减少padding，按钮在容器内 */
+    padding: 0 40px; /* 小屏幕上减少padding，按钮在容器内 */
   }
   
   .best-sales-nav-prev {
@@ -1098,6 +1098,13 @@ body {
   
   .best-sales-nav-next {
     right: -40px; /* 小屏幕上按钮在容器内 */
+  }
+
+  .ast-builder-grid-row-3-equal .ast-builder-grid-row,
+  .news-single-content, 
+  .products-archive-content,
+  .single-product-content {
+    padding: 0 20px;
   }
 }
 
@@ -1116,7 +1123,7 @@ body {
 
 .product-detail-grid {
   display: grid;
-  grid-template-columns: 460px 1fr;
+  grid-template-columns: 480px 1fr;
   gap: 20px;
   align-items: start;
 }
@@ -1219,7 +1226,6 @@ body {
 .product-gallery-thumbs img { width: 80px; height: 80px; object-fit: cover; display: block; }
 
 .product-gallery-main {
-  background: #FAFAFA;
   min-height: 420px;
   display: flex;
   align-items: center;
