@@ -25,7 +25,7 @@ $download_icon_url = get_site_url() . '/wp-content/uploads/2025/10/b01.png';
         <?php
         // Breadcrumb - 支持多种breadcrumb插件
         // 自定义简单的breadcrumb
-        echo '<div class="breadcrumb-wrapper" style="padding: 0 20px;">';
+        echo '<div class="breadcrumb-wrapper">';
         echo '<a href="' . esc_url(home_url('/')) . '">Home</a> > ';
         echo '<a href="' . esc_url(get_post_type_archive_link('products')) . '">Products</a> ';
         // echo '<span>' . esc_html(get_the_title()) . '</span>';
