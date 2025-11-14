@@ -988,8 +988,8 @@ function ym_best_sales_products_shortcode($atts) {
         </div>
         
         <?php if ($post_count > 1) : // 如果超过1个item，显示按钮 ?>
-          <button class="best-sales-nav best-sales-nav-prev" aria-label="Previous">&lt;</button>
-          <button class="best-sales-nav best-sales-nav-next" aria-label="Next">&gt;</button>
+          <button class="best-sales-nav best-sales-nav-prev" aria-label="Previous"><i class="fa fa-chevron-left" aria-hidden="true"></i></button>
+          <button class="best-sales-nav best-sales-nav-next" aria-label="Next"><i class="fa fa-chevron-right" aria-hidden="true"></i></button>
         <?php endif; ?>
       </div>
     </div>

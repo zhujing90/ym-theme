@@ -178,7 +178,10 @@ $download_icon_url = get_site_url() . '/wp-content/uploads/2025/10/b01.png';
                         <!-- 左侧：图廊 -->
                         <div class="product-gallery">
                             <div class="product-gallery-thumbs">
-                                <button type="button" class="thumb-nav up" aria-label="up" id="thumb-nav-up"><i class="fa fa-chevron-up" aria-hidden="true"></i></button>
+                                <button type="button" class="thumb-nav up" aria-label="up" id="thumb-nav-up">
+                                    <i class="fa fa-chevron-up desktop-icon" aria-hidden="true"></i>
+                                    <i class="fa fa-chevron-left mobile-icon" aria-hidden="true"></i>
+                                </button>
                                 <div class="thumb-scroll-container">
                                     <ul class="thumb-list">
                                         <?php foreach ( $images as $idx => $img_id ) :
@@ -193,7 +196,10 @@ $download_icon_url = get_site_url() . '/wp-content/uploads/2025/10/b01.png';
                                         <?php endforeach; ?>
                                     </ul>
                                 </div>
-                                <button type="button" class="thumb-nav down" aria-label="down" id="thumb-nav-down"><i class="fa fa-chevron-down" aria-hidden="true"></i></button>
+                                <button type="button" class="thumb-nav down" aria-label="down" id="thumb-nav-down">
+                                    <i class="fa fa-chevron-down desktop-icon" aria-hidden="true"></i>
+                                    <i class="fa fa-chevron-right mobile-icon" aria-hidden="true"></i>
+                                </button>
                             </div>
                             <div class="product-gallery-main">
                                 <?php if ( ! empty( $images ) ) :
