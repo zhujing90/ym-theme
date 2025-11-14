@@ -16,7 +16,7 @@ $product_banner_url = get_site_url() . '/wp-content/uploads/2025/10/products-ban
 ?>
 
 <div class="product-hero-wrapper">
-    <div class="product-hero" style="background-image: url('<?php echo esc_url( $product_banner_url ); ?>'); background-size: cover; background-position: center center; background-repeat: no-repeat; height: 250px; display: block; margin: 0; padding: 0;"></div>
+    <div class="product-hero" style="background-image: url('<?php echo esc_url( $product_banner_url ); ?>');"></div>
 </div>
 
 <div class="container">

@@ -17,7 +17,7 @@ $download_icon_url = get_site_url() . '/wp-content/uploads/2025/10/b01.png';
 ?>
 
 <div class="product-hero-wrapper">
-    <div class="product-hero" style="background-image: url('<?php echo esc_url( $product_banner_url ); ?>'); background-size: cover; background-position: center center; background-repeat: no-repeat; height: 250px; display: block; margin: 0; padding: 0;"></div>
+    <div class="product-hero" style="background-image: url('<?php echo esc_url( $product_banner_url ); ?>');"></div>
 </div>
 
 <div class="container">
@@ -230,9 +230,32 @@ $download_icon_url = get_site_url() . '/wp-content/uploads/2025/10/b01.png';
                 </article>
 
                 <div class="single-product-body">
+                    <div class="single-product-content-title-wrapper">
+                        <span class="single-product-content-title">Introduction</span>
+                    </div>
                   <div class="single-product-content">
+                    
                       <?php the_content(); ?>
                   </div>
+              </div>
+              <div class="single-product-inquery-form">
+                <div class="single-product-content-title-wrapper">
+                    <span class="single-product-content-title">Send Message</span>
+                </div>
+                <div class="single-product-inquery-form-content">
+                    <div class="single-product-inquery-form-content-title-wrapper">
+                        <span class="single-product-inquery-form-content-title">Inquire: <?php the_title(); ?></span>
+                    </div>
+                  <?php echo do_shortcode('[wpforms id="893"]'); ?>
+                </div>
+              </div>
+              <div class="single-product-related-products">
+                <div class="single-product-content-title-wrapper">
+                    <span class="single-product-content-title">Related Products</span>
+                </div>
+                <div class="single-product-related-products-list">
+                  <?php echo do_shortcode('[related_products limit="3"]'); ?>
+                </div>
               </div>
             </section>
 

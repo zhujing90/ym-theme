@@ -13,7 +13,7 @@ get_header(); ?>
 $banner_url = get_site_url() . '/wp-content/uploads/2025/10/bg-news-single-scaled.png';
 ?>
 <div class="news-single-hero-wrapper">
-    <div class="news-single-hero" style="background-image: url('<?php echo esc_url($banner_url); ?>'); background-size: cover; background-position: center center; background-repeat: no-repeat; height: 250px; display: block; margin: 0; padding: 0;">
+    <div class="news-single-hero" style="background-image: url('<?php echo esc_url($banner_url); ?>');">
     </div>
 </div>
 

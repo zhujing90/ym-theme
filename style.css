@@ -421,7 +421,7 @@ body {
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
-  height: 250px; /* 你可以改成想要的高度 */
+  height: 150px; /* 你可以改成想要的高度 */
 }
 
 /* 修正正文容器 */
@@ -687,6 +687,13 @@ body {
 }
 
 /* 响应式布局 */
+@media (min-width: 1000px) and (max-width: 1200px) {
+  .product-image {
+    width: 180px;
+    height: 200px;
+  }
+}
+
 @media (max-width: 1024px) {
   .product-category-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -828,7 +835,7 @@ body {
 
 .product-thumb img {
   height: auto;
-  width: 260px;
+  width: 100%;
   object-fit: contain;
   transition: opacity 0.3s ease;
 }
@@ -881,7 +888,7 @@ body {
 /* 标题区域 */
 .product-title-wrapper {
   background: #F6F6F6;
-  padding: 12px 0px;
+  padding: 20px 0px;
   text-align: center;
   min-height: 64px;
   display: flex;
@@ -910,7 +917,7 @@ body {
   font-size: 14px;
   opacity: 0;
   transition: opacity 0.3s ease;
-  margin-top: 8px;
+  padding-right: 20px;
 }
 
 .arrow-icon {
@@ -920,8 +927,8 @@ body {
 
 /* Hover 效果 */
 .product-card:hover {
-  background: #1976D2;
-  opacity: 0.9;
+  background: #1976D2 !important;
+  opacity: 0.9 !important;
 }
 
 .product-card:hover .product-thumb {
@@ -1248,6 +1255,29 @@ body {
 
 .single-product-body { margin-top: 20px; }
 .single-product-content { font-size: 16px; line-height: 28px; color: #333; }
+
+/* Related Products Section */
+.single-product-related-products, .single-product-inquery-form {
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+
+.single-product-related-products-list, .single-product-inquery-form-content {
+  width: 100%;
+}
+.single-product-inquery-form-content-title-wrapper {
+  background: #F6F6F6;
+  border: 1px solid #EEEEEE;
+  padding: 8px 12px;
+}
+.single-product-inquery-form-content-title {
+  font-weight: 400;
+  font-size: 16px;
+  color: #666666;
+  line-height: 30px;
+}
+.single-product-content-title-wrapper { padding: 15px 0; }
+.single-product-content-title { font-size: 24px; line-height: 28px; color: #1B77D2; font-weight: 600;}
 .product-pdf { margin-top: 16px; }
 .product-pdf-button { 
     display: inline-block; 
@@ -1336,7 +1366,6 @@ body {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    background: #fafafa !important;
     box-sizing: border-box !important;
     margin: 0 !important;
     padding: 0 !important;

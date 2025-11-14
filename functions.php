@@ -1179,3 +1179,109 @@ function ym_product_category_grid_shortcode($atts) {
     return ob_get_clean();
 }
 add_shortcode('product_category_grid', 'ym_product_category_grid_shortcode');
+
+/**
+ * Shortcode: [related_products limit="3"]
+ * 显示相关产品（同分类下的其他产品）
+ */
+function ym_related_products_shortcode($atts) {
+    $atts = shortcode_atts(array(
+        'limit' => 3,
+    ), $atts, 'related_products');
+    
+    // 获取当前产品ID
+    $current_post_id = get_the_ID();
+    if (!$current_post_id) {
+        return '';
+    }
+    
+    // 获取当前产品的分类
+    $terms = get_the_terms($current_post_id, 'product_category');
+    if (empty($terms) || is_wp_error($terms)) {
+        return '';
+    }
+    
+    // 获取所有分类ID
+    $term_ids = array();
+    foreach ($terms as $term) {
+        $term_ids[] = $term->term_id;
+    }
+    
+    // 查询同分类下的其他产品（排除当前产品）
+    $args = array(
+        'post_type' => 'product',
+        'posts_per_page' => intval($atts['limit']),
+        'post__not_in' => array($current_post_id),
+        'tax_query' => array(
+            array(
+                'taxonomy' => 'product_category',
+                'field' => 'term_id',
+                'terms' => $term_ids,
+            ),
+        ),
+        'orderby' => 'date',
+        'order' => 'DESC',
+    );
+    
+    $query = new WP_Query($args);
+    
+    ob_start();
+    
+    if ($query->have_posts()) :
+        ?>
+        <div class="product-grid">
+            <?php while ($query->have_posts()) : $query->the_post();
+                // 获取产品分类
+                $product_terms = get_the_terms(get_the_ID(), 'product_category');
+                $category_name = '';
+                if ($product_terms && !is_wp_error($product_terms)) {
+                    $category_name = $product_terms[0]->name;
+                }
+            ?>
+                <article id="post-<?php the_ID(); ?>" <?php post_class('product-card'); ?>>
+                    <a href="<?php the_permalink(); ?>" class="product-card-link">
+                        <div class="product-thumb">
+                            <?php if (has_post_thumbnail()) {
+                                the_post_thumbnail('medium');
+                            } else {
+                                echo '<div class="product-placeholder"></div>';
+                            } ?>
+                        </div>
+                        
+                        <!-- Hover 覆盖层 -->
+                        <div class="product-hover-overlay">
+                            <div class="product-hover-content">
+                                <svg class="product-search-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="11" cy="11" r="8" stroke="white" stroke-width="2" fill="none"/>
+                                    <path d="m21 21-4.35-4.35" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <?php if ($category_name) : ?>
+                                    <div class="product-category-name"><?php echo esc_html($category_name); ?></div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        
+                        <div class="product-title-wrapper">
+                            <h3 class="product-title">
+                                <?php the_title(); ?>
+                            </h3>
+                            <div class="product-view-more">
+                                <span>View More</span>
+                                <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M5 12h14M12 5l7 7-7 7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </a>
+                </article>
+            <?php endwhile; ?>
+        </div>
+        <?php
+    else :
+        echo '<p>No related products found.</p>';
+    endif;
+    
+    wp_reset_postdata();
+    return ob_get_clean();
+}
+add_shortcode('related_products', 'ym_related_products_shortcode');
