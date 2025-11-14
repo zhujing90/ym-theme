@@ -1153,7 +1153,7 @@ function ym_product_category_grid_shortcode($atts) {
                 $term_link = '#';
             }
         ?>
-            <div class="product-card">
+            <div class="product-category-card">
                 <div class="product-content">
                     <h3 class="product-title"><?php echo esc_html($term->name); ?></h3>
                     <a href="<?php echo esc_url($term_link); ?>" class="view-more">View More</a>

@@ -589,7 +589,7 @@ body {
 }
 
 /* 每个产品卡片 */
-.product-category-grid .product-card {
+.product-category-grid .product-category-card {
   position: relative;
   background: #FFFFFF;
   box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);
@@ -649,20 +649,20 @@ body {
 }
 
 /* 悬停效果 */
-.product-card:hover {
-  background: #1976D2 !important;
+.product-category-card:hover {
+  background: #4CAF50 !important;
   box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1) !important;
   opacity: 0.9 !important;
   color: #fff;
 }
 
-.product-card:hover .product-title,
-.product-card:hover .product-sublist li,
-.product-card:hover .view-more {
+.product-category-card:hover .product-title,
+.product-category-card:hover .product-sublist li,
+.product-category-card:hover .view-more {
   color: #fff;
 }
 
-.product-card:hover .product-image img {
+.product-category-card:hover .product-image img {
   opacity: 0.3;
   transform: scale(1.05);
 }
@@ -795,7 +795,10 @@ body {
 /* ====== Product Card Styles ====== */
 .product-card {
   background: #FFFFFF;
-  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.1), 
+              0px -2px 5px 0px rgba(0, 0, 0, 0.1),
+              2px 0px 5px 0px rgba(0, 0, 0, 0.1),
+              -2px 0px 5px 0px rgba(0, 0, 0, 0.1);
   border-radius: 4px;
   overflow: hidden;
   position: relative;
@@ -921,12 +924,17 @@ body {
   opacity: 0.9;
 }
 
+.product-card:hover .product-thumb {
+  background: rgba(25, 118, 210, 0.3); /* hover时图片区域背景为半透明蓝色 */
+}
+
 .product-card:hover .product-thumb img {
-  opacity: 0.3;
+  opacity: 0.7; /* 提高图片可见度 */
 }
 
 .product-card:hover .product-hover-overlay {
   opacity: 1;
+  background: rgba(25, 118, 210, 0.5); /* hover时遮罩层背景为半透明蓝色 */
 }
 
 .product-card:hover .product-search-icon,
@@ -939,10 +947,11 @@ body {
 }
 
 .product-card:hover .product-title {
-  color: #FFFFFF;
+  display: none; /* hover时隐藏标题 */
 }
 
 .product-card:hover .product-view-more {
+  display: flex; /* hover时显示View More */
   opacity: 1;
 }
 
@@ -990,6 +999,7 @@ body {
   gap: 24px;
   transition: transform 0.3s ease;
   will-change: transform;
+  padding: 5px;
 }
 
 .best-sales-item {
