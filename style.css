@@ -19,6 +19,9 @@ body {
   font-family: Montserrat ;
 }
 
+.container {
+  padding-bottom: 50px;
+}
 .ast-above-header-wrap {
 	height: 50px;
 }
@@ -745,10 +748,46 @@ body {
   font-size: 16px;
   color: #333333;
   line-height: 60px;
+  flex: 1;
+}
+
+/* 分类项包装器 */
+.category-item-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* 折叠按钮 */
+.category-toggle {
+  background: inherit; /* 继承父元素的背景颜色 */
+  border: none;
+  cursor: pointer;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 60px;
+  transition: color 0.3s ease, background 0.3s ease;
+  color: #333333;
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* 激活状态下的按钮颜色 */
+.category-level-1.active .category-toggle {
+  color: #FFFFFF;
+  background: #1976D2; /* 跟随一级分类的蓝色背景 */
+}
+
+.category-toggle i {
+  font-size: 14px;
+  transition: transform 0.3s ease;
 }
 
 /* 激活的一级分类 */
-.category-level-1.active .category-link {
+.category-level-1.active > .category-item-wrapper > .category-link {
   font-weight: 400;
   font-size: 16px;
   color: #FFFFFF;
@@ -756,7 +795,7 @@ body {
   background: #1976D2;
 }
 
-.category-level-1 .category-link:hover  {
+.category-level-1 > .category-item-wrapper > .category-link:hover  {
   background: #1976D2;
   color: #FFFFFF;
 }
@@ -770,12 +809,13 @@ body {
 .category-level-2 .category-link {
   padding-left: 30px;
   position: relative;
+  background: transparent !important; /* 确保二级分类不受一级分类样式影响 */
 }
 
 /* 激活的二级分类 - 添加竖线 */
 .category-level-2.active .category-link {
   position: relative;
-  background: rgba(48, 131, 214, 0.1);
+  background: rgba(48, 131, 214, 0.1) !important; /* 使用 !important 确保优先级 */
 }
 
 .category-level-2.active .category-link::before {
@@ -797,6 +837,22 @@ body {
   list-style: none;
   padding: 0;
   margin: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+}
+
+/* 默认折叠状态 */
+.sub-categories.collapsed {
+  max-height: 0;
+  opacity: 0;
+  display: none;
+}
+
+/* 展开状态 */
+.sub-categories.expanded {
+  max-height: 1000px;
+  opacity: 1;
+  display: block;
 }
 
 /* ====== Product Card Styles ====== */
@@ -1259,7 +1315,6 @@ body {
 /* Related Products Section */
 .single-product-related-products, .single-product-inquery-form {
   margin-top: 40px;
-  margin-bottom: 40px;
 }
 
 .single-product-related-products-list, .single-product-inquery-form-content {

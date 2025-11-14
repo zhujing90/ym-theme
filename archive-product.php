@@ -88,26 +88,42 @@ $product_banner_url = get_site_url() . '/wp-content/uploads/2025/10/products-ban
                                 }
                             }
                             
-                            echo '<li class="' . esc_attr( $class ) . '">';
-                            echo '<a href="' . esc_url( $term_link ) . '" class="category-link">';
-                            echo esc_html( $term->name );
-                            echo '</a>';
-                            echo '</li>';
-                            
-                            // 如果有子分类，需要包裹一个容器来设置背景色
+                            // 检查是否有子分类
                             $has_children = get_terms( [
                                 'taxonomy'   => 'product_category',
                                 'hide_empty' => false,
                                 'parent'     => $term->term_id,
                                 'number'     => 1,
                             ] );
+                            $has_children_bool = ! is_wp_error( $has_children ) && ! empty( $has_children );
                             
-                            if ( ! is_wp_error( $has_children ) && ! empty( $has_children ) ) {
+                            // 判断是否应该默认展开（当前激活的分类或其父分类）
+                            $should_expand = ( $is_active || $is_active_parent ) && $has_children_bool;
+                            
+                            echo '<li class="' . esc_attr( $class ) . ( $has_children_bool ? ' has-children' : '' ) . '">';
+                            echo '<div class="category-item-wrapper">';
+                            echo '<a href="' . esc_url( $term_link ) . '" class="category-link">';
+                            echo esc_html( $term->name );
+                            echo '</a>';
+                            if ( $has_children_bool ) {
+                                echo '<span type="button" class="category-toggle" aria-label="Toggle subcategories" data-expanded="' . ( $should_expand ? 'true' : 'false' ) . '">';
+                                if ( $should_expand ) {
+                                    echo '<i class="fa fa-caret-down" aria-hidden="true"></i>';
+                                } else {
+                                    echo '<i class="fa fa-caret-right" aria-hidden="true"></i>';
+                                }
+                                echo '</span>';
+                            }
+                            echo '</div>';
+                            
+                            if ( $has_children_bool ) {
                                 $sub_class = ( $is_active || $is_active_parent ) ? 'sub-categories active-parent' : 'sub-categories';
+                                $sub_class .= $should_expand ? ' expanded' : ' collapsed';
                                 echo '<ul class="' . esc_attr( $sub_class ) . '">';
                                 display_category_tree( $term->term_id, $level + 1, $current_term_id, $active_parent_id );
                                 echo '</ul>';
                             }
+                            echo '</li>';
                         }
                     }
 
@@ -196,5 +212,43 @@ $product_banner_url = get_site_url() . '/wp-content/uploads/2025/10/products-ban
 </div>
 
 <?php get_footer(); ?>
+
+<script>
+// 产品分类折叠功能
+(function() {
+  var toggles = document.querySelectorAll('.category-toggle');
+  
+  toggles.forEach(function(toggle) {
+    toggle.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      var isExpanded = toggle.getAttribute('data-expanded') === 'true';
+      var subCategories = toggle.closest('.category-level-1').querySelector('.sub-categories');
+      
+      if (subCategories) {
+        var toggleIcon = toggle.querySelector('i');
+        if (isExpanded) {
+          // 折叠
+          subCategories.classList.remove('expanded');
+          subCategories.classList.add('collapsed');
+          toggle.setAttribute('data-expanded', 'false');
+          if (toggleIcon) {
+            toggleIcon.className = 'fa fa-caret-right';
+          }
+        } else {
+          // 展开
+          subCategories.classList.remove('collapsed');
+          subCategories.classList.add('expanded');
+          toggle.setAttribute('data-expanded', 'true');
+          if (toggleIcon) {
+            toggleIcon.className = 'fa fa-caret-down';
+          }
+        }
+      }
+    });
+  });
+})();
+</script>
 
 
