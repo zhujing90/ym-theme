@@ -19,6 +19,17 @@ body {
   font-family: Montserrat ;
 }
 
+p, 
+.entry-content p, 
+.edit-post-visual-editor p,
+.editor-styles-wrapper .block-editor-block-list__layout.is-root-container p{
+  margin-bottom: 0 !important;
+}
+
+.wp-block-freeform.block-library-rich-text__tinymce li, .wp-block-freeform.block-library-rich-text__tinymce p {
+  line-height: 1.5;
+}
+
 .container {
   padding-bottom: 50px;
 }
