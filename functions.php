@@ -48,6 +48,8 @@ function create_news_post_type() {
             'singular_name' => __('News Item')
         ),
         'public' => true,
+        'exclude_from_search' => false,
+        'publicly_queryable' => true,
         'has_archive' => true,
         'menu_icon' => 'dashicons-media-document',
         'rewrite' => array('slug' => 'our-news'),
@@ -84,17 +86,20 @@ add_action('add_meta_boxes', function () {
 });
 
 function ym_register_product_cpt() {
-  $labels = ['name' => 'Products', 'singular_name' => 'Product'];
-  $args = [
-    'labels' => $labels, 
-    'public' => true, 
+  register_post_type('product', array(
+    'labels' => array(
+        'name' => __('Products'),
+        'singular_name' => __('Product Item')
+    ),
+    'public' => true,
+    'exclude_from_search' => false,
+    'publicly_queryable' => true,
     'has_archive' => true,
-    'menu_icon' => 'dashicons-products', 
-    'rewrite' => ['slug' => 'products'],
-    'supports' => ['title', 'editor', 'thumbnail', 'excerpt'],
-    'show_in_nav_menus' => true, // 确保在菜单中可见
-  ];
-  register_post_type('product', $args);
+    'menu_icon' => 'dashicons-products',
+    'rewrite' => array('slug' => 'products'),
+    'supports' => array('title', 'editor', 'excerpt', 'thumbnail', 'revisions'),
+    'show_in_rest' => true, 
+));
   
   register_taxonomy('product_category', 'product', [
     'label' => 'Product Categories', 
@@ -104,6 +109,7 @@ function ym_register_product_cpt() {
     'show_ui' => true,
     'show_in_nav_menus' => true, // 确保在菜单中可见
     'public' => true, // 确保是公开的
+    'exclude_from_search' => false,
     'publicly_queryable' => true, // 可以公开查询
   ]);
 }
@@ -1285,3 +1291,10 @@ function ym_related_products_shortcode($atts) {
     return ob_get_clean();
 }
 add_shortcode('related_products', 'ym_related_products_shortcode');
+
+function my_theme_search_custom_post_types( $query ) {
+    if ( $query->is_search() && ! is_admin() ) {
+        $query->set( 'post_type', array( 'post', 'page', 'my_post_type' ) );
+    }
+}
+add_action( 'pre_get_posts', 'my_theme_search_custom_post_types' );
