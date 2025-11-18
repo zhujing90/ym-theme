@@ -111,12 +111,13 @@ function ym_register_product_cpt() {
     'public' => true, // 确保是公开的
     'exclude_from_search' => false,
     'publicly_queryable' => true, // 可以公开查询
+    'show_in_rest' => true, // 确保在 Gutenberg 编辑器中可见
   ]);
 }
 add_action('init', 'ym_register_product_cpt');
 
 function enable_elementor_for_products($post_types) {
-    $post_types[] = 'products';
+    $post_types[] = 'product'; // 修正：使用 'product' 而不是 'products'
     return $post_types;
 }
 add_filter('elementor/cpt_support', 'enable_elementor_for_products');
