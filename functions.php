@@ -1293,9 +1293,76 @@ function ym_related_products_shortcode($atts) {
 }
 add_shortcode('related_products', 'ym_related_products_shortcode');
 
-function my_theme_search_custom_post_types( $query ) {
-    if ( $query->is_search() && ! is_admin() ) {
-        $query->set( 'post_type', array( 'post', 'page', 'my_post_type' ) );
+/**
+ * 修改搜索查询以包含自定义 post type (product 和 news)
+ */
+function ym_search_custom_post_types( $query ) {
+    if ( $query->is_search() && ! is_admin() && $query->is_main_query() ) {
+        // 包含标准的 post 和 page，以及自定义的 product 和 news
+        $query->set( 'post_type', array( 'post', 'page', 'product', 'news' ) );
+		$query->set('tax_query', []); // 清空语言过滤
     }
 }
-add_action( 'pre_get_posts', 'my_theme_search_custom_post_types' );
+add_action( 'pre_get_posts', 'ym_search_custom_post_types' );
+
+/**
+ * 为 Astra 主题的 REST API 搜索添加自定义 post type 支持
+ */
+function ym_astra_rest_search_support() {
+    // 确保 product 和 news 在 REST API 搜索中可用
+    add_filter( 'rest_post_query', function( $args, $request ) {
+        // 检查是否是 Astra 的搜索请求
+        if ( isset( $request['post_type'] ) && strpos( $request['post_type'], 'ast_queried' ) !== false ) {
+            $search_post_types = explode( ':', sanitize_text_field( $request['post_type'] ) );
+            
+            // 如果搜索类型中包含我们的自定义类型，确保它们被正确处理
+            if ( ! empty( $args['post_type'] ) && is_array( $args['post_type'] ) ) {
+                // 确保 product 和 news 在搜索类型列表中
+                if ( in_array( 'product', $search_post_types ) && ! in_array( 'product', $args['post_type'] ) ) {
+                    $args['post_type'][] = 'product';
+                }
+                if ( in_array( 'news', $search_post_types ) && ! in_array( 'news', $args['post_type'] ) ) {
+                    $args['post_type'][] = 'news';
+                }
+            }
+        }
+        return $args;
+    }, 10, 2 );
+}
+add_action( 'rest_api_init', 'ym_astra_rest_search_support' );
+
+/**
+ * 为 Astra 搜索添加自定义 post type 到默认搜索类型列表
+ */
+function ym_astra_add_custom_post_types_to_search( $localize_data ) {
+    // 获取默认的搜索类型
+    $default_types = isset( $localize_data['search_post_types'] ) ? $localize_data['search_post_types'] : array( 'post', 'page' );
+    
+    // 添加自定义 post type
+    if ( ! in_array( 'product', $default_types ) ) {
+        $default_types[] = 'product';
+    }
+    if ( ! in_array( 'news', $default_types ) ) {
+        $default_types[] = 'news';
+    }
+    
+    $localize_data['search_post_types'] = $default_types;
+    
+    // 添加标签
+    if ( ! isset( $localize_data['search_post_types_labels'] ) ) {
+        $localize_data['search_post_types_labels'] = array();
+    }
+    
+    $product_obj = get_post_type_object( 'product' );
+    if ( $product_obj ) {
+        $localize_data['search_post_types_labels']['product'] = $product_obj->labels->name;
+    }
+    
+    $news_obj = get_post_type_object( 'news' );
+    if ( $news_obj ) {
+        $localize_data['search_post_types_labels']['news'] = $news_obj->labels->name;
+    }
+    
+    return $localize_data;
+}
+add_filter( 'astra_search_js_localize', 'ym_astra_add_custom_post_types_to_search' );
