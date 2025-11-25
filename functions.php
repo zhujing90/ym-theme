@@ -1366,3 +1366,6 @@ function ym_astra_add_custom_post_types_to_search( $localize_data ) {
     return $localize_data;
 }
 add_filter( 'astra_search_js_localize', 'ym_astra_add_custom_post_types_to_search' );
+
+add_filter( 'widget_text', 'do_shortcode' );
+add_filter( 'widget_text_content', 'do_shortcode' );
